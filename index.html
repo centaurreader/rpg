@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG</title>
+    <style>
+      li { padding: 8px; }
+      #player {
+        position: relative;
+        display: inline-block;
+        background-color: darkblue;
+        color: #fff;
+        height: 20px;
+        width: 20px;
+      }
+      #player::after {
+        position: absolute;
+        top: -4px;
+        left: 6px;
+        background-color: cyan;
+        content: ' ';
+        height: 8px;
+        width: 8px;
+      }
+      #enemy {
+        position: relative;
+        display: inline-block;
+        background-color: #34533D;
+        color: #fff;
+        height: 20px;
+        width: 20px;
+      }
+      #enemy::after {
+        position: absolute;
+        top: -4px;
+        left: 6px;
+        background-color: lime;
+        content: ' ';
+        height: 8px;
+        width: 8px;
+      }
+      .attack { visibility: hidden; }
+      .attack-lit { visibility: visible; }
+    </style>
+  </head>
+  <body>
+    <h1>Welcome to RPG</h1>
+    <ul>
+      <li>Player</li>
+      <li id="level">Level 1</li>
+      <li id="xp">0 xp</li>
+      <li><span id="gp">0 gp</span></li>
+      <li><span id="player"></span></li>
+    </ul>
+    <ul><li id="attack" class="attack">⚡</li></ul>
+    <ul>
+      <li>Level 1 Orc</li>
+      <li><span id="enemy"></span></li>
+      <li><span id="loot"></span></li>
+    </ul>
+    <script>
+      const xp = document.getElementById('xp');
+      const level = document.getElementById('level');
+      const enemy = document.getElementById('enemy');
+      const attack = document.getElementById('attack');
+      const loot = document.getElementById('loot');
+      const gp = document.getElementById('gp');
+      function onAttack() {
+        attack.classList.add('attack-lit');
+      }
+      enemy.addEventListener('mousedown', onAttack);
+      enemy.addEventListener('touchstart', onAttack);
+      function onLoot(itemName) {
+          loot.innerHTML = `Dropped: ${itemName}`;
+          setTimeout(() => { loot.innerHTML = ''; }, 2000);
+      }
+      const lootTable = [
+          [
+              'Amazing',
+              'Bad',
+              'Broken',
+              'Cheap',
+              'Cool',
+              'Crappy',
+              'Dank',
+              'Fancy',
+              'Heavy',
+              'Magic',
+              'Shiny',
+              'Ugly',
+              'Worthless',
+          ],
+          [
+              'Shoes',
+              'Pants',
+              'Sword',
+              'Helmet',
+              'Cuirass',
+              'Buckler',
+              'Shield',
+              'Lance',
+              'Bow',
+              'Boots',
+              'Hat',
+              'Staff',
+              'Scepter',
+              'Flail',
+              'Mace',
+              'Axe',
+              'Hammer',
+              'Cap',
+              'Ribbon',
+              'Shirt',
+              'Chainmail',
+              'Pads',
+              'Shoulders',
+              'Spaulders',
+          ],
+      ];
+
+      function shouldLoot() {
+          const limit = 10000;
+          const rng = Math.ceil(Math.random() * limit);
+          const skewed = rng / .6;
+          return skewed > limit;
+      }
+      function genLoot() {
+          const cat1 = Math.floor(Math.random() * lootTable[0].length);
+          const cat2 = Math.floor(Math.random() * lootTable[1].length);
+          return `${lootTable[0][cat1]} ${lootTable[1][cat2]}`;
+      }
+      function genGold() {
+          const orcGoldMax = 20;
+          const orcGoldMin = 1;
+          return Math.ceil(Math.random() * orcGoldMax) || orcGoldMin;
+      }
+      function afterAttack() {
+        const currentXp = parseInt(xp.innerHTML.split(' ')[0], 10);
+        const newXp = currentXp === 9
+          ? 0
+          : currentXp + 1;
+        xp.innerHTML = `${newXp} xp`;
+        const currentLevel = parseInt(level.innerHTML.split(' ')[1], 10);
+        const newLevel = newXp === 0
+          ? currentLevel + 1
+          : currentLevel;
+        level.innerHTML = `Level ${newLevel}`;
+        if (shouldLoot()) {
+            onLoot(genLoot());
+        }
+        gp.innerHTML = `${parseInt(gp.innerHTML.split(' ')[0], 10) + genGold()} gp`;
+        attack.classList.remove('attack-lit');
+      }
+      enemy.addEventListener('mouseup', afterAttack);
+      enemy.addEventListener('touchend', afterAttack);
+    </script>
+  </body>
+</html>
