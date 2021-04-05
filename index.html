@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RPG</title>
     <style>
+      ::-webkit-scrollbar {
+        -webkit-appearance: none;
+        width: 7px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background-color: rgba(0, 0, 0, .5);
+        box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+      }
+
       li { padding: 8px; }
       #player {
         position: relative;
@@ -42,17 +53,61 @@
       }
       .attack { visibility: hidden; }
       .attack-lit { visibility: visible; }
+
+      .player_area {
+        display: flex;
+      }
+
+      .section {
+        border: 2px solid black;
+        flex: 1;
+        padding: 1rem;
+      }
+
+      #xp {
+        z-index: 2;
+      }
+      .xp_bar {
+        display: flex;
+        background: rgba(180,40,255,0.2);
+        position: relative;
+      }
+      .xp_status {
+        background: rgba(180,40,255, 1);
+        width: 0;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        transition: width .125s;
+      }
+
+      #inventory {
+        max-height: 8rem;
+        overflow-y: scroll;
+      }
     </style>
   </head>
   <body>
     <h1>Welcome to RPG</h1>
-    <ul>
-      <li>Player</li>
-      <li id="level">Level 1</li>
-      <li id="xp">0 xp</li>
-      <li><span id="gp">0 gp</span></li>
-      <li><span id="player"></span></li>
-    </ul>
+    <div class="player_area">
+      <diV class="section">
+        <h2>Player</h2>
+        <div class="xp_bar">
+          <div id="xp_status" class="xp_status"></div>
+          <span id="xp">0 xp</span>
+        </div>
+        <ul>
+          <li id="level">Level 1</li>
+          <li><span id="gp">0 gp</span></li>
+          <li><span id="player"></span></li>
+        </ul>
+      </diV>
+      <div class="section">
+        <h2>Inventory</h2>
+        <ul id="inventory">
+        </ul>
+      </div>
+    </div>
     <ul><li id="attack" class="attack">⚡</li></ul>
     <ul>
       <li>Level 1 Orc</li>
@@ -61,10 +116,12 @@
     </ul>
     <script>
       const xp = document.getElementById('xp');
+      const xpStatusEl = document.getElementById('xp_status');
       const level = document.getElementById('level');
       const enemy = document.getElementById('enemy');
       const attack = document.getElementById('attack');
       const loot = document.getElementById('loot');
+      const inventory = document.getElementById('inventory');
       const gp = document.getElementById('gp');
       function onAttack() {
         attack.classList.add('attack-lit');
@@ -73,7 +130,15 @@
       enemy.addEventListener('touchstart', onAttack);
       function onLoot(itemName) {
           loot.innerHTML = `Dropped: ${itemName}`;
-          setTimeout(() => { loot.innerHTML = ''; }, 2000);
+          setTimeout(() => {
+            loot.innerHTML = '';
+            addInventoryItem(itemName);
+          }, 2000);
+      }
+      function addInventoryItem(itemName) {
+        const itemEl = document.createElement('li');
+        itemEl.innerText = itemName;
+        inventory.appendChild(itemEl);
       }
       const lootTable = [
           [
@@ -141,6 +206,7 @@
           ? 0
           : currentXp + 1;
         xp.innerHTML = `${newXp} xp`;
+        xpStatusEl.setAttribute('style', `width: ${newXp / .1}%`);
         const currentLevel = parseInt(level.innerHTML.split(' ')[1], 10);
         const newLevel = newXp === 0
           ? currentLevel + 1
