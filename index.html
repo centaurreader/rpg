@@ -34,7 +34,7 @@
         height: 8px;
         width: 8px;
       }
-      #enemy {
+      .enemy_sprite {
         position: relative;
         display: inline-block;
         background-color: #34533D;
@@ -42,7 +42,7 @@
         height: 20px;
         width: 20px;
       }
-      #enemy::after {
+      .enemy_sprite::after {
         position: absolute;
         top: -4px;
         left: 6px;
@@ -50,6 +50,15 @@
         content: ' ';
         height: 8px;
         width: 8px;
+      }
+      .miss {
+        position: absolute;
+        background: rgb(188,30,00);
+        color: rgb(255,255,255);
+        font-size: .75rem;
+        font-weight: bold;
+        padding: 2px; 
+        border-radius: 4px;
       }
       .attack { visibility: hidden; }
       .attack-lit { visibility: visible; }
@@ -94,7 +103,7 @@
         <h2>Player</h2>
         <div class="xp_bar">
           <div id="xp_status" class="xp_status"></div>
-          <span id="xp">0 xp</span>
+          <span id="xp">0 / XXX xp</span>
         </div>
         <ul>
           <li id="level">Level 1</li>
@@ -110,36 +119,149 @@
     </div>
     <ul><li id="attack" class="attack">⚡</li></ul>
     <ul>
-      <li>Level 1 Orc</li>
-      <li><span id="enemy"></span></li>
+      <li id="enemy"></li>
       <li><span id="loot"></span></li>
     </ul>
     <script>
-      const xp = document.getElementById('xp');
+      // UI ELEMENTS
+      const xpEl = document.getElementById('xp');
       const xpStatusEl = document.getElementById('xp_status');
-      const level = document.getElementById('level');
-      const enemy = document.getElementById('enemy');
+      const levelEl = document.getElementById('level');
+      const enemyEl = document.getElementById('enemy');
       const attack = document.getElementById('attack');
-      const loot = document.getElementById('loot');
-      const inventory = document.getElementById('inventory');
-      const gp = document.getElementById('gp');
-      function onAttack() {
-        attack.classList.add('attack-lit');
+      const inventoryEl = document.getElementById('inventory');
+      const gpEl = document.getElementById('gp');
+      const lootDropEl = document.getElementById('loot');
+
+      // DATA BINDING
+      const UI = {
+        xp: {
+          element: xpEl,
+          value: (el, state) => {
+            const currentXp = new Intl.NumberFormat(navigator.language).format(state.xp);
+            const xpForLevel = new Intl.NumberFormat(navigator.language).format(getXpForLevel(state.level));
+            el.innerHTML = `${currentXp} / ${xpForLevel} xp`;
+          },
+        },
+        xpStatus: { element: xpStatusEl, value: (el, state) => {
+          const percent = state.xp / getXpForLevel(state.level);
+          el.setAttribute('style', `width: ${percent * 100}%`);
+        }, },
+        gp: {
+          element: gpEl,
+          value: (el, state) => {
+            el.innerHTML = `${el, state.gp} gp`;
+          },
+        },
+        level: {
+          element: levelEl,
+          value: (el, state) => {
+            el.innerHTML = `Level ${state.level}`;
+          },
+        },
+        inventory: {
+          element: inventoryEl,
+          value: (el, state) => {
+            el.innerHTML = null;
+            state.inventory.forEach((item) => {
+              const itemEl = document.createElement('li');
+              itemEl.innerText = item;
+              el.appendChild(itemEl);
+            });
+          },
+        },
+        lootDrop: {
+          element: lootDropEl,
+          value: (() => {
+            let lastLoot;
+            return (el, state) => {
+              const newestLoot = state.inventory[state.inventory.length - 1];
+              if (lastLoot !== newestLoot) {
+                loot.innerHTML = `Dropped: ${newestLoot}`;
+                setTimeout(() => {
+                  loot.innerHTML = '';
+                }, 2000);
+              }
+              lastLoot = newestLoot;
+            };
+          })(),
+        },
+        enemy: {
+          element: enemy,
+          value: (() => {
+            let lastEnemy;
+            return (el, state) => {
+              if (state.enemy) {
+                el.innerHTML = null;
+
+                const spriteContainer = document.createElement('li');
+                const sprite = document.createElement('span');
+                sprite.classList.add('enemy_sprite');
+                if (state.enemy.hp === (lastEnemy && lastEnemy.hp)) {
+                  const missEl = document.createElement('span');
+                  missEl.classList.add('miss');
+                  missEl.innerText = 'MISS';
+                  sprite.appendChild(missEl);
+                  setTimeout(() => sprite.removeChild(missEl), 500);
+                }
+                spriteContainer.appendChild(sprite);
+                el.appendChild(spriteContainer);
+
+                const name = document.createElement('li');
+                name.innerHTML = `Level ${state.enemy.level} ${state.enemy.name}`;
+                el.appendChild(name);
+
+                const hp = document.createElement('li');
+                hp.innerHTML = `${state.enemy.hp} hp`;
+                el.appendChild(hp);
+              }
+              lastEnemy = state.enemy;
+            };
+          })(),
+        },
+      };
+      const updateUi = (currentState) => {
+        Object.values(UI).forEach(item => {
+          item.value(item.element, currentState);
+        });
+      };
+
+      // GAME STATE
+      function State() {
+        let state = {
+          xp: 0,
+          gp: 0,
+          damage: 10,                    
+          level: 1,
+          inventory: [],
+          enemy: null,
+        };
+        this.getState = () => state;
+        this.setState = incoming => {
+          state = {
+            ...state,
+            ...incoming,
+          };
+        };
       }
-      enemy.addEventListener('mousedown', onAttack);
-      enemy.addEventListener('touchstart', onAttack);
-      function onLoot(itemName) {
-          loot.innerHTML = `Dropped: ${itemName}`;
-          setTimeout(() => {
-            loot.innerHTML = '';
-            addInventoryItem(itemName);
-          }, 2000);
+      const gameState = new State();
+      const SAVE_KEY = 'rpg-state';
+      function save() {
+        localStorage.setItem(SAVE_KEY, JSON.stringify(gameState.getState()));
       }
-      function addInventoryItem(itemName) {
-        const itemEl = document.createElement('li');
-        itemEl.innerText = itemName;
-        inventory.appendChild(itemEl);
+      function load() {
+        try {
+          gameState.setState(JSON.parse(localStorage.getItem(SAVE_KEY)));
+          if (!gameState.getState().enemy) {
+            genEnemy();
+          }
+          updateUi(gameState.getState());
+        } catch (err) {
+          // do nothing
+        }
       }
+
+      // GAME ENGINE
       const lootTable = [
           [
               'Amazing',
@@ -183,43 +305,136 @@
               'Spaulders',
           ],
       ];
-
-      function shouldLoot() {
-          const limit = 10000;
-          const rng = Math.ceil(Math.random() * limit);
-          const skewed = rng / .6;
-          return skewed > limit;
-      }
-      function genLoot() {
-          const cat1 = Math.floor(Math.random() * lootTable[0].length);
-          const cat2 = Math.floor(Math.random() * lootTable[1].length);
-          return `${lootTable[0][cat1]} ${lootTable[1][cat2]}`;
-      }
-      function genGold() {
-          const orcGoldMax = 20;
-          const orcGoldMin = 1;
-          return Math.ceil(Math.random() * orcGoldMax) || orcGoldMin;
-      }
-      function afterAttack() {
-        const currentXp = parseInt(xp.innerHTML.split(' ')[0], 10);
-        const newXp = currentXp === 9
-          ? 0
-          : currentXp + 1;
-        xp.innerHTML = `${newXp} xp`;
-        xpStatusEl.setAttribute('style', `width: ${newXp / .1}%`);
-        const currentLevel = parseInt(level.innerHTML.split(' ')[1], 10);
-        const newLevel = newXp === 0
-          ? currentLevel + 1
-          : currentLevel;
-        level.innerHTML = `Level ${newLevel}`;
-        if (shouldLoot()) {
-            onLoot(genLoot());
+      const enemyTable = [
+        [
+          { name: 'Beautiful', modifier: 2 },
+          { name: 'Berserk', modifier: 5 },
+          { name: 'Bored', modifier: 1 },
+          { name: 'Brilliant', modifier: 2 },
+          { name: 'Cursed', modifier: 10 },
+          { name: 'Dark', modifier: 9 },
+          { name: 'Drunk', modifier: 6 },
+          { name: 'Dull', modifier: 5 },
+          { name: 'Dumpy', modifier: 2 },
+          { name: 'Fat', modifier: 3 },
+          { name: 'Light', modifier: 4 },
+          { name: 'Mystic', modifier: 8 },
+          { name: 'Raging', modifier: 7 },
+          { name: 'Skinny', modifier: 2 },
+          { name: 'Stinky', modifier: 5 },
+          { name: 'Stoned', modifier: 2 },
+          { name: 'Ugly', modifier: 8 },
+          { name: 'Wretched', modifier: 9 },
+        ],
+        [
+          { name: 'Orc', modifier: 10, },
+        ],
+      ];
+      const getEnemyLevelForPlayerLevel = (level) => {
+        const diff = Math.ceil(Math.random() * 10);
+        return Math.abs(diff > 5 ? level + diff : level - diff);
+      };
+      const getXpForLevel = (level) => {
+        const translation = 100;
+        const percentageIncrease = .1;
+        return Math.ceil(translation * (1 + percentageIncrease)**level);
+      };
+      const calcXp = (xpToAdd) => {
+        const currentXp = gameState.getState().xp;
+        const newXp = currentXp + 10;
+        gameState.setState({
+          xp: newXp,
+        });
+      };
+      const calcLevel = () => {
+        const { xp, level, } = gameState.getState();
+        gameState.setState({
+          level: xp >= getXpForLevel(level) ? level + 1 : level,
+          xp: xp >= getXpForLevel(level) ? 0 : xp,
+        });
+      };
+      const shouldLoot = () => {
+        const limit = 10000;
+        const rng = Math.ceil(Math.random() * limit);
+        const skewed = rng / .6;
+        return skewed > limit;
+      };
+      const lootProc = () => {
+        if (!shouldLoot()) {
+          return;
         }
-        gp.innerHTML = `${parseInt(gp.innerHTML.split(' ')[0], 10) + genGold()} gp`;
+        const cat1 = Math.floor(Math.random() * lootTable[0].length);
+        const cat2 = Math.floor(Math.random() * lootTable[1].length);
+        const state = gameState.getState();
+        gameState.setState({
+          inventory: [
+            ...state.inventory,
+            `${lootTable[0][cat1]} ${lootTable[1][cat2]}`,
+          ],
+        });
+      };
+      const calcGp = () => {
+        const orcGoldMax = 20;
+        const orcGoldMin = 1;
+        const goldDropped = Math.ceil(Math.random() * orcGoldMax) || orcGoldMin;
+
+        const state = gameState.getState();
+        gameState.setState({
+          gp: state.gp + goldDropped,
+        });
+      };
+      const genEnemy = () => {
+        const state = gameState.getState();
+        const level = getEnemyLevelForPlayerLevel(state.level);
+        const type = enemyTable[0][Math.floor(Math.random() * enemyTable[0].length)];
+        const enemy = enemyTable[1][Math.floor(Math.random() * enemyTable[1].length)];
+        gameState.setState({
+          enemy: {
+            name: `${type.name} ${enemy.name}`,
+            level,
+            hp: type.modifier * enemy.modifier,
+          },
+        });
+      };
+      const rollDamage = () => {
+        const { damage } = gameState.getState();
+        return Math.floor(Math.random() * 100) > 25 ? damage : 0;
+      };
+      const reduceEnemyHp = (damage) => {
+        const { enemy } = gameState.getState();
+        gameState.setState({
+          enemy: {
+            ...enemy,
+            hp: enemy.hp - damage,
+          },
+        });
+      };
+      function onAttack() { attack.classList.add('attack-lit'); }
+      function tick() {
         attack.classList.remove('attack-lit');
+
+        reduceEnemyHp(rollDamage());
+        // check to see if enemy is dead
+        if (gameState.getState().enemy.hp <= 0) {
+          calcXp();
+          calcLevel();
+          lootProc();
+          calcGp();
+          genEnemy();
+        }
+        updateUi(gameState.getState());
+        save();
       }
-      enemy.addEventListener('mouseup', afterAttack);
-      enemy.addEventListener('touchend', afterAttack);
+
+      // BIND ACTIONS
+      enemyEl.addEventListener('mousedown', onAttack);
+      enemyEl.addEventListener('touchstart', onAttack);
+      enemyEl.addEventListener('mouseup', tick);
+      enemyEl.addEventListener('touchend', tick);
+
+
+      // init
+      load();
     </script>
   </body>
 </html>
