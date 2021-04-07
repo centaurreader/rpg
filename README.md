@@ -10,5 +10,6 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [x] Make monsters take damage (and make player miss them sometimes)
 - [ ] Add stats to gear, equip gear, augment player stats (damage)
 - [ ] Add player HP and receive damage from monster when attacking; add death state; make gear affect hp
+- [ ] Make it display correctly on phones (prevent double tap zooming?)
 - [ ] Sell inventory items for GP
 - [ ] Buy items with GP
