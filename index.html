@@ -7,131 +7,171 @@
     <meta property="og:site_name" content="RPG by Centaur Reader">
     <meta property="og:url" content="https://centaurreader.com/rpg">
     <title>RPG by Centaur Reader</title>
+    <link rel="stylesheet" href="reset.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;900&display=swap" rel="stylesheet">
     <style>
-      ::-webkit-scrollbar {
-        -webkit-appearance: none;
-        width: 7px;
+      * { box-sizing: border-box; }
+      body {
+        background-color: #2f2c2c;
+        color: #f6e8e8;
+        font-family: 'Noto Sans JP', sans-serif;
       }
 
-      ::-webkit-scrollbar-thumb {
-        border-radius: 4px;
-        background-color: rgba(0, 0, 0, .5);
-        box-shadow: 0 0 1px rgba(255, 255, 255, .5);
-      }
-
-      li { padding: 8px; }
-      #player {
-        position: relative;
-        display: inline-block;
-        background-color: darkblue;
-        color: #fff;
-        height: 20px;
-        width: 20px;
-      }
-      #player::after {
-        position: absolute;
-        top: -4px;
-        left: 6px;
-        background-color: cyan;
-        content: ' ';
-        height: 8px;
-        width: 8px;
-      }
-      .enemy_sprite {
-        position: relative;
-        display: inline-block;
-        background-color: #34533D;
-        color: #fff;
-        height: 20px;
-        width: 20px;
-      }
-      .enemy_sprite::after {
-        position: absolute;
-        top: -4px;
-        left: 6px;
-        background-color: lime;
-        content: ' ';
-        height: 8px;
-        width: 8px;
-      }
-      .miss {
-        position: absolute;
-        background: rgb(188,30,00);
-        color: rgb(255,255,255);
-        font-size: .75rem;
-        font-weight: bold;
-        padding: 2px; 
-        border-radius: 4px;
-      }
-      .attack { visibility: hidden; }
-      .attack-lit { visibility: visible; }
-
-      .player_area {
-        display: flex;
-      }
-
-      .section {
-        border: 2px solid black;
-        flex: 1;
-        padding: 1rem;
-      }
-
-      #xp {
-        z-index: 2;
-      }
-      .xp_bar {
-        display: flex;
-        background: rgba(180,40,255,0.2);
-        position: relative;
-      }
-      .xp_status {
-        background: rgba(180,40,255, 1);
-        width: 0;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        transition: width .125s;
-      }
-
+      #gp,
       #inventory {
         max-height: 8rem;
         overflow-y: scroll;
+        display: none;
+      }
+      #dungeon { position: relative; }
+      #loot { min-height: 1rem; }
+
+      .title {
+        font-size: 2.75rem;
+        font-weight: 900;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+      .main_container {
+        border: 10px solid #f6e8e8;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        margin: 0 auto;
+        max-width: 448px;
+        padding: 12px;
+      }
+      .info_area { flex: 1; }
+      .info_area-player { margin-bottom: 88px; }
+      .info_area-enemy { margin-top: 16px; }
+      .graphics_area { position: relative; height: 168px; }
+      .sprite { position: absolute; }
+      .sprite-hero {
+        top: -72px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 3;
+      }
+      .sprite-attack {
+        bottom: 4px;
+        left: 50%;
+        transform: translateX(-50%);
+        visibility: hidden;
+        z-index: 5;
+      }
+      .sprite-enemy {
+        bottom: 4px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 4;
+      }
+      .sprite-background {
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2;
+      }
+
+      .visually_hidden { display: none; }
+
+      .label-large {
+        font-weight: 900;
+        font-size: 1.5rem;
+        margin-bottom: .5rem;
+      }
+      .label-medium {
+        font-weight: 500;
+        font-size: 1.25rem;
+        margin-bottom: .5rem;
+      }
+      .label-small {
+        font-weight: 500;
+        font-size: 1rem;
+        margin-bottom: .5rem;
+      }
+      .bar {
+        border: 4px solid #f6e8e8;
+        background-color: transparent;
+        height: 1.75rem;
+        margin-bottom: .25rem;
+        position: relative;
+      }
+      .bar_filler {
+        background-color: #f6e8e8;
+        bottom: 0;
+        position: absolute;
+        top: 0;
+        transition: width .125s;
+        width: 0;
+      }
+      .action_button {
+        background-color: #f6e8e8;
+        padding: .5rem;
+        font-size: 2rem;
+        font-weight: 900;
+        color: #2f2c2c;
+        border: 0;
+        box-shadow: none;
+        max-width: 408px;
+        width: 100%;
+        margin: 1rem auto;
+        display: block;
       }
     </style>
   </head>
   <body>
-    <h1>Welcome to RPG</h1>
     <div class="player_area">
-      <diV class="section">
-        <h2>Player</h2>
-        <div class="xp_bar">
-          <div id="xp_status" class="xp_status"></div>
-          <span id="xp">0 / XXX xp</span>
-        </div>
-        <ul>
-          <li id="level">Level 1</li>
-          <li><span id="gp">0 gp</span></li>
-          <li><span id="player"></span></li>
-        </ul>
-      </diV>
       <div class="section">
-        <h2>Inventory</h2>
+        <span id="gp">0 gp</span>
         <ul id="inventory">
         </ul>
       </div>
     </div>
-    <ul><li id="attack" class="attack">⚡</li></ul>
-    <ul>
-      <li id="enemy"></li>
-      <li><span id="loot"></span></li>
-    </ul>
+
+    <h1 class="title">Murder Death Click</h1>
+    <div id="dungeon" class="main_container">
+      <section class="info_area info_area-player">
+        <h2 class="visually_hidden">Player</h2>
+        <p id="level" class="label-large">Level 1</p>
+        <div class="bar">
+          <div class="bar_filler" id="xp_status"></div>
+        </div>
+        <p class="label-medium" id="xp">0 / XXX xp</p>
+      </section>
+
+      <div class="graphics_area">
+        <img class="sprite sprite-hero" src="hero.gif" alt="" />
+        <img id="attack" class="sprite sprite-attack" src="attack.gif" alt="" />
+        <img id="miss" class="sprite sprite-attack" src="miss.gif" alt="" />
+        <img id="enemy" class="sprite sprite-enemy" src="enemy.gif" alt="" />
+        <img class="sprite sprite-background" src="floor.gif" alt="" />
+      </div>
+
+      <section class="info_area info_area-enemy">
+        <h2 class="visually_hidden">Enemy</h2>
+        <p class="label-large"><span id="enemy_level">Level 1</span> <span id="enemy_name">Fat Orc</span></p>
+        <div class="bar">
+          <div class="bar_filler" id="enemy_hp_status"></div>
+        </div>
+        <p class="label-medium" id="enemy_hp">0 / XXX hp</p>
+        <p class="label-small" id="loot"></p>
+      </section>
+
+    </div>
+    <button id="attack_action" class="action_button" type="button">Attack</button>
+
     <script>
       // UI ELEMENTS
       const xpEl = document.getElementById('xp');
       const xpStatusEl = document.getElementById('xp_status');
       const levelEl = document.getElementById('level');
-      const enemyEl = document.getElementById('enemy');
-      const attack = document.getElementById('attack');
+      const enemyNameEl = document.getElementById('enemy_name');
+      const enemyLevelEl = document.getElementById('enemy_level');
+      const enemyHpEl = document.getElementById('enemy_hp');
+      const enemyHpStatusEl = document.getElementById('enemy_hp_status');
+      const hitEl = document.getElementById('attack');
+      const missEl = document.getElementById('miss');
+      const attackButtonEl = document.getElementById('attack_action');
       const inventoryEl = document.getElementById('inventory');
       const gpEl = document.getElementById('gp');
       const lootDropEl = document.getElementById('loot');
@@ -189,38 +229,40 @@
             };
           })(),
         },
-        enemy: {
-          element: enemy,
-          value: (() => {
-            let lastEnemy;
-            return (el, state) => {
-              if (state.enemy) {
-                el.innerHTML = null;
-
-                const spriteContainer = document.createElement('li');
-                const sprite = document.createElement('span');
-                sprite.classList.add('enemy_sprite');
-                if (state.enemy.hp === (lastEnemy && lastEnemy.hp)) {
-                  const missEl = document.createElement('span');
-                  missEl.classList.add('miss');
-                  missEl.innerText = 'MISS';
-                  sprite.appendChild(missEl);
-                  setTimeout(() => sprite.removeChild(missEl), 500);
-                }
-                spriteContainer.appendChild(sprite);
-                el.appendChild(spriteContainer);
-
-                const name = document.createElement('li');
-                name.innerHTML = `Level ${state.enemy.level} ${state.enemy.name}`;
-                el.appendChild(name);
-
-                const hp = document.createElement('li');
-                hp.innerHTML = `${state.enemy.hp} hp`;
-                el.appendChild(hp);
-              }
-              lastEnemy = state.enemy;
-            };
-          })(),
+        enemyName: {
+          element: enemyNameEl,
+          value: (el, state) => {
+            if (state.enemy) {
+              el.innerHTML = state.enemy.name;
+            }
+          },
+        },
+        enemyLevel: {
+          element: enemyLevelEl,
+          value: (el, state) => {
+            if (state.enemy) {
+              el.innerHTML = `Level ${state.enemy.level}`;
+            }
+          }
+        },
+        enemyHp: {
+          element: enemyHpEl,
+          value: (el, state) => {
+            if (state.enemy) {
+              el.innerHTML = `${state.enemy.hp} / ${state.enemy.maxHp} hp`;
+            }
+            lastEnemy = state.enemy;
+          },
+        },
+        enemyHpStatus: {
+          element: enemyHpStatusEl,
+          value: (el, state) => {
+            if (state.enemy) {
+              const percent = state.enemy.hp / state.enemy.maxHp;
+              el.setAttribute('style', `width: ${percent * 100}%`);
+            }
+            lastEnemy = state.enemy;
+          },
         },
       };
       const updateUi = (currentState) => {
@@ -396,6 +438,7 @@
             name: `${type.name} ${enemy.name}`,
             level,
             hp: type.modifier * enemy.modifier,
+            maxHp: type.modifier * enemy.modifier,
           },
         });
       };
@@ -412,12 +455,18 @@
           },
         });
       };
-      function onAttack() { attack.classList.add('attack-lit'); }
+      function onAttack() {
+        attack.setAttribute('style', 'visibility: visible');
+      }
       function tick() {
-        attack.classList.remove('attack-lit');
+        attack.setAttribute('style', 'visibility: hidden');
 
-        reduceEnemyHp(rollDamage());
-        // check to see if enemy is dead
+        const damageDone = rollDamage();
+        if (damageDone === 0) {
+          missEl.setAttribute('style', 'visibility: visible');
+          setTimeout(() => { missEl.setAttribute('style', 'visibility: hidden'); }, 500);
+        }
+        reduceEnemyHp(damageDone);
         if (gameState.getState().enemy.hp <= 0) {
           calcXp();
           calcLevel();
@@ -430,10 +479,10 @@
       }
 
       // BIND ACTIONS
-      enemyEl.addEventListener('mousedown', onAttack);
-      enemyEl.addEventListener('touchstart', onAttack);
-      enemyEl.addEventListener('mouseup', tick);
-      enemyEl.addEventListener('touchend', tick);
+      attackButtonEl.addEventListener('mousedown', onAttack);
+      attackButtonEl.addEventListener('touchstart', onAttack);
+      attackButtonEl.addEventListener('mouseup', tick);
+      attackButtonEl.addEventListener('touchend', tick);
 
 
       // init
