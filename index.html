@@ -19,12 +19,6 @@
         font-family: 'Noto Sans JP', sans-serif;
       }
 
-      #gp,
-      #inventory {
-        max-height: 8rem;
-        overflow-y: scroll;
-        display: none;
-      }
       #dungeon { position: relative; }
       #loot { min-height: 1rem; }
 
@@ -42,6 +36,18 @@
         margin: 0 auto;
         max-width: 448px;
         padding: 12px;
+      }
+      .toolbar {
+        display: flex;
+        justify-content: flex-end;
+        max-width: 448px;
+        margin: 0 auto;
+        background-color: #f6e8e8;
+        padding: 10px 10px 0;
+      }
+      .toolbar--item {
+        background-color: #2f2c2c;
+        display: inline-block;
       }
       .info_area { flex: 1; }
       .info_area-player { margin-bottom: 88px; }
@@ -118,18 +124,81 @@
         margin: 1rem auto;
         display: block;
       }
+      .action_button-hollow {
+        background-color: transparent;
+        border: 4px solid #f6e8e8;
+        color: #f6e8e8;
+      }
+      .modal {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-color: #2f2c2c;
+        z-index: 1000;
+        transform: translateY(100%);
+        transition: transform .25s;
+      }
+      .modal-visible {
+        transform: translateY(0);
+      }
+      .modal-sub {
+        transform: translate(-100%, 0);
+      }
+      .modal_inner {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        margin: 0 auto;
+        max-width: 448px;
+      }
+      #gp {
+        text-align: right;
+        margin-top: 1rem;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        border: 10px solid #f6e8e8;
+        padding: 12px;
+        overflow-y: auto;
+        margin-top: 1rem;
+      }
+      .container_fill {
+        flex: 1;
+      }
+      .inventory_category {
+        background-color: #f6e8e8;
+        color: #2f2c2c;
+        font-size: 1rem;
+        font-weight: 500;
+        padding: .25rem;
+      }
+      .inventory_item {
+        display: block;
+        margin-bottom: 1.5rem;
+        color: #f6e8e8;
+        text-decoration: none;
+      }
+      .inventory_item:hover {
+        text-shadow: 2px 2px 2px #C93900;
+      }
+      .inventory_item-border {
+        border-bottom: 2px solid #f6e8e8;
+      }
     </style>
   </head>
   <body>
-    <div class="player_area">
-      <div class="section">
-        <span id="gp">0 gp</span>
-        <ul id="inventory">
-        </ul>
-      </div>
-    </div>
-
     <h1 class="title">Murder Death Click</h1>
+    <ul class="toolbar">
+      <li class="toolbar--item">
+        <a href="#" id="inventory_button">
+          <img src="inventory.gif" alt="Inventory" />
+        </a>
+      </li>
+    </ul>
     <div id="dungeon" class="main_container">
       <section class="info_area info_area-player">
         <h2 class="visually_hidden">Player</h2>
@@ -161,118 +230,38 @@
     </div>
     <button id="attack_action" class="action_button" type="button">Attack</button>
 
+    <section id="inventory" class="modal">
+      <div class="modal_inner">
+        <h1 class="visually_hidden">Equipment</h1>
+        <p id="gp" class="label-small">1,000,000 gp</p>
+        <div class="container">
+          <div id="equipped_items"></div>
+
+          <p class="label-small inventory_category">Unequipped</p>
+          <ul id="unequipped_items"></ul>
+        </div>
+        <button id="inventory_close_button" class="action_button" type="button">Close</button>
+      </div>
+    </section>
+
+    <section id="inventory_detail" class="modal">
+      <div class="modal_inner">
+        <h1 class="visually_hidden">Item Detail</h1>
+        <div class="container">
+          <div id="inventory_detail_item" class="container_fill"></div>
+          <div id="inventory_detail_actions"></div>
+        </div>
+        <button id="inventory_detail_close_button" class="action_button" type="button">Back</button>
+      </div>
+    </section>
+
     <script>
-      // UI ELEMENTS
-      const xpEl = document.getElementById('xp');
-      const xpStatusEl = document.getElementById('xp_status');
-      const levelEl = document.getElementById('level');
-      const enemyNameEl = document.getElementById('enemy_name');
-      const enemyLevelEl = document.getElementById('enemy_level');
-      const enemyHpEl = document.getElementById('enemy_hp');
-      const enemyHpStatusEl = document.getElementById('enemy_hp_status');
-      const hitEl = document.getElementById('attack');
-      const missEl = document.getElementById('miss');
-      const attackButtonEl = document.getElementById('attack_action');
-      const inventoryEl = document.getElementById('inventory');
-      const gpEl = document.getElementById('gp');
-      const lootDropEl = document.getElementById('loot');
-
-      // DATA BINDING
-      const UI = {
-        xp: {
-          element: xpEl,
-          value: (el, state) => {
-            const currentXp = new Intl.NumberFormat(navigator.language).format(state.xp);
-            const xpForLevel = new Intl.NumberFormat(navigator.language).format(getXpForLevel(state.level));
-            el.innerHTML = `${currentXp} / ${xpForLevel} xp`;
-          },
-        },
-        xpStatus: { element: xpStatusEl, value: (el, state) => {
-          const percent = state.xp / getXpForLevel(state.level);
-          el.setAttribute('style', `width: ${percent * 100}%`);
-        }, },
-        gp: {
-          element: gpEl,
-          value: (el, state) => {
-            el.innerHTML = `${el, state.gp} gp`;
-          },
-        },
-        level: {
-          element: levelEl,
-          value: (el, state) => {
-            el.innerHTML = `Level ${state.level}`;
-          },
-        },
-        inventory: {
-          element: inventoryEl,
-          value: (el, state) => {
-            el.innerHTML = null;
-            state.inventory.forEach((item) => {
-              const itemEl = document.createElement('li');
-              itemEl.innerText = item;
-              el.appendChild(itemEl);
-            });
-          },
-        },
-        lootDrop: {
-          element: lootDropEl,
-          value: (() => {
-            let lastLoot;
-            return (el, state) => {
-              const newestLoot = state.inventory[state.inventory.length - 1];
-              if (lastLoot !== newestLoot) {
-                loot.innerHTML = `Dropped: ${newestLoot}`;
-                setTimeout(() => {
-                  loot.innerHTML = '';
-                }, 2000);
-              }
-              lastLoot = newestLoot;
-            };
-          })(),
-        },
-        enemyName: {
-          element: enemyNameEl,
-          value: (el, state) => {
-            if (state.enemy) {
-              el.innerHTML = state.enemy.name;
-            }
-          },
-        },
-        enemyLevel: {
-          element: enemyLevelEl,
-          value: (el, state) => {
-            if (state.enemy) {
-              el.innerHTML = `Level ${state.enemy.level}`;
-            }
-          }
-        },
-        enemyHp: {
-          element: enemyHpEl,
-          value: (el, state) => {
-            if (state.enemy) {
-              el.innerHTML = `${state.enemy.hp} / ${state.enemy.maxHp} hp`;
-            }
-            lastEnemy = state.enemy;
-          },
-        },
-        enemyHpStatus: {
-          element: enemyHpStatusEl,
-          value: (el, state) => {
-            if (state.enemy) {
-              const percent = state.enemy.hp / state.enemy.maxHp;
-              el.setAttribute('style', `width: ${percent * 100}%`);
-            }
-            lastEnemy = state.enemy;
-          },
-        },
-      };
-      const updateUi = (currentState) => {
-        Object.values(UI).forEach(item => {
-          item.value(item.element, currentState);
-        });
-      };
-
-      // GAME STATE
+      /*
+        //////////
+        BEGIN GAME
+        \\\\\\\\\\
+      */
+      // state
       function State() {
         let state = {
           xp: 0,
@@ -281,6 +270,7 @@
           level: 1,
           inventory: [],
           enemy: null,
+          inventoryItem: null,
         };
         this.getState = () => state;
         this.setState = incoming => {
@@ -303,52 +293,67 @@
           }
           updateUi(gameState.getState());
         } catch (err) {
-          // do nothing
+          console.log(err);
         }
       }
 
-      // GAME ENGINE
+      // engine
+      const equipmentSlots = [
+        { key: 'HEAD', value: 'Head', },
+        { key: 'BODY', value: 'Body', },
+        { key: 'LEFT_HAND', value: 'Left Hand', },
+        { key: 'RIGHT_HAND', value: 'Right Hand', },
+        { key: 'LEGS', value: 'Legs', },
+        { key: 'FEET', value: 'Feet', },
+      ];
       const lootTable = [
           [
-              'Amazing',
-              'Bad',
-              'Broken',
-              'Cheap',
-              'Cool',
-              'Crappy',
-              'Dank',
-              'Fancy',
-              'Heavy',
-              'Magic',
-              'Shiny',
-              'Ugly',
-              'Worthless',
+              { name: 'Amazing', modifier: 1, },
+              { name: 'Bad', modifier: 1, },
+              { name: 'Broken', modifier: 1, },
+              { name: 'Cheap', modifier: 1, },
+              { name: 'Cool', modifier: 1, },
+              { name: 'Crappy', modifier: 1, },
+              { name: 'Dank', modifier: 1, },
+              { name: 'Fancy', modifier: 1, },
+              { name: 'Heavy', modifier: 1, },
+              { name: 'Magic', modifier: 1, },
+              { name: 'Shiny', modifier: 1, },
+              { name: 'Ugly', modifier: 1, },
+              { name: 'Worthless', modifier: 1, },
           ],
           [
-              'Shoes',
-              'Pants',
-              'Sword',
-              'Helmet',
-              'Cuirass',
-              'Buckler',
-              'Shield',
-              'Lance',
-              'Bow',
-              'Boots',
-              'Hat',
-              'Staff',
-              'Scepter',
-              'Flail',
-              'Mace',
-              'Axe',
-              'Hammer',
-              'Cap',
-              'Ribbon',
-              'Shirt',
-              'Chainmail',
-              'Pads',
-              'Shoulders',
-              'Spaulders',
+            { name: 'Boots', type: 'FEET', modifier: 1, },
+            { name: 'Clogs', type: 'FEET', modifier: 1, },
+            { name: 'Sandals', type: 'FEET', modifier: 1, },
+            { name: 'Shoes', type: 'FEET', modifier: 1, },
+
+            { name: 'Pants', type: 'LEGS', modifier: 1, },
+            { name: 'Loin Cloth', type: 'LEGS', modifier: 1, },
+            { name: 'Skirt', type: 'LEGS', modifier: 1, },
+            { name: 'Leggings', type: 'LEGS', modifier: 1, },
+
+            { name: 'Cap', type: 'HEAD', modifier: 1, },
+            { name: 'Hat', type: 'HEAD', modifier: 1, },
+            { name: 'Helmet', type: 'HEAD', modifier: 1, },
+            { name: 'Ribbon', type: 'HEAD', modifier: 1, },
+
+            { name: 'Chainmail', type: 'BODY', modifier: 1, },
+            { name: 'Cuirass', type: 'BODY', modifier: 1, },
+            { name: 'Doublet', type: 'BODY', modifier: 1, },
+            { name: 'Shirt', type: 'BODY', modifier: 1, },
+
+            { name: 'Axe', type: 'HAND', modifier: 1, },
+            { name: 'Bow', type: 'HAND', modifier: 1, },
+            { name: 'Buckler', type: 'HAND', modifier: 1, },
+            { name: 'Flail', type: 'HAND', modifier: 1, },
+            { name: 'Hammer', type: 'HAND', modifier: 1, },
+            { name: 'Lance', type: 'HAND', modifier: 1, },
+            { name: 'Mace', type: 'HAND', modifier: 1, },
+            { name: 'Scepter', type: 'HAND', modifier: 1, },
+            { name: 'Staff', type: 'HAND', modifier: 1, },
+            { name: 'Sword', type: 'HAND', modifier: 1, },
+            { name: 'Tower Shield', type: 'HAND', modifier: 1, },
           ],
       ];
       const enemyTable = [
@@ -411,11 +416,19 @@
         }
         const cat1 = Math.floor(Math.random() * lootTable[0].length);
         const cat2 = Math.floor(Math.random() * lootTable[1].length);
+        const type = lootTable[1][cat2].type;
         const state = gameState.getState();
         gameState.setState({
           inventory: [
             ...state.inventory,
-            `${lootTable[0][cat1]} ${lootTable[1][cat2]}`,
+            {
+              name: `${lootTable[0][cat1].name} ${lootTable[1][cat2].name}`,
+              quality: lootTable[0][cat1],
+              type: lootTable[1][cat2],
+              power: (lootTable[0][cat1].modifier * lootTable[1][cat2].modifier) + 10,
+              statType: type === 'HAND' ? 'Damage' : 'HP',
+              equipped: null,
+            },
           ],
         });
       };
@@ -444,8 +457,10 @@
         });
       };
       const rollDamage = () => {
-        const { damage } = gameState.getState();
-        return Math.floor(Math.random() * 100) > 25 ? damage : 0;
+        const { damage, inventory, } = gameState.getState();
+        const arms = inventory.filter((item) => (item.equipped || '').includes('HAND') && item.statType === 'Damage');
+        const calculatedDamage = damage + arms.reduce((total, item) => item.power + total, 0);
+        return Math.floor(Math.random() * 100) > 25 ? calculatedDamage : 0;
       };
       const reduceEnemyHp = (damage) => {
         const { enemy } = gameState.getState();
@@ -479,14 +494,372 @@
         save();
       }
 
-      // BIND ACTIONS
+      /*
+        \\\\\\\\
+        BEGIN UI
+        ////////
+      */
+      // main ui
+      const inventoryButtonEl = document.getElementById('inventory_button');
+      const xpEl = document.getElementById('xp');
+      const xpStatusEl = document.getElementById('xp_status');
+      const levelEl = document.getElementById('level');
+      const enemyNameEl = document.getElementById('enemy_name');
+      const enemyLevelEl = document.getElementById('enemy_level');
+      const enemyHpEl = document.getElementById('enemy_hp');
+      const enemyHpStatusEl = document.getElementById('enemy_hp_status');
+      const hitEl = document.getElementById('attack');
+      const missEl = document.getElementById('miss');
+      const attackButtonEl = document.getElementById('attack_action');
+      const lootDropEl = document.getElementById('loot');
+      // inventory
+      const inventoryModalEl = document.getElementById('inventory');
+      const inventoryCloseEl = document.getElementById('inventory_close_button');
+      const inventoryDetailModalEl = document.getElementById('inventory_detail');
+      const inventoryDetailCloseEl = document.getElementById('inventory_detail_close_button');
+      const gpEl = document.getElementById('gp');
+      const equippedItemsEl = document.getElementById('equipped_items');
+      const unequippedInventoryEl = document.getElementById('unequipped_items');
+      const inventoryDetailItemEl = document.getElementById('inventory_detail_item');
+      const inventoryDetailActionsEl = document.getElementById('inventory_detail_actions');
+
+      // data binding
+      const UI = {
+        xp: {
+          element: xpEl,
+          value: (el, state) => {
+            const currentXp = new Intl.NumberFormat(navigator.language).format(state.xp);
+            const xpForLevel = new Intl.NumberFormat(navigator.language).format(getXpForLevel(state.level));
+            el.innerHTML = `${currentXp} / ${xpForLevel} xp`;
+          },
+        },
+        xpStatus: { element: xpStatusEl, value: (el, state) => {
+          const percent = state.xp / getXpForLevel(state.level);
+          el.setAttribute('style', `width: ${percent * 100}%`);
+        }, },
+        gp: {
+          element: gpEl,
+          value: (el, state) => {
+            el.innerHTML = `${el, state.gp} gp`;
+          },
+        },
+        level: {
+          element: levelEl,
+          value: (el, state) => {
+            el.innerHTML = `Level ${state.level}`;
+          },
+        },
+        lootDrop: {
+          element: lootDropEl,
+          value: (() => {
+            let lastLoot;
+            return (el, state) => {
+              const newestLoot = state.inventory[state.inventory.length - 1];
+              if (lastLoot !== newestLoot) {
+                loot.innerHTML = `Dropped: ${newestLoot.name}`;
+                setTimeout(() => {
+                  loot.innerHTML = '';
+                }, 2000);
+              }
+              lastLoot = newestLoot;
+            };
+          })(),
+        },
+        enemyName: {
+          element: enemyNameEl,
+          value: (el, state) => {
+            if (state.enemy) {
+              el.innerHTML = state.enemy.name;
+            }
+          },
+        },
+        enemyLevel: {
+          element: enemyLevelEl,
+          value: (el, state) => {
+            if (state.enemy) {
+              el.innerHTML = `Level ${state.enemy.level}`;
+            }
+          }
+        },
+        enemyHp: {
+          element: enemyHpEl,
+          value: (el, state) => {
+            if (state.enemy) {
+              el.innerHTML = `${state.enemy.hp} / ${state.enemy.maxHp} hp`;
+            }
+            lastEnemy = state.enemy;
+          },
+        },
+        enemyHpStatus: {
+          element: enemyHpStatusEl,
+          value: (el, state) => {
+            if (state.enemy) {
+              const percent = state.enemy.hp / state.enemy.maxHp;
+              el.setAttribute('style', `width: ${percent * 100}%`);
+            }
+            lastEnemy = state.enemy;
+          },
+        },
+        equippedItems: {
+          element: equippedItemsEl,
+          value: (el, state) => {
+            el.innerHTML = null;
+
+            equipmentSlots.forEach((slot) => {
+              const equippedItem = state.inventory.find((item) => item.equipped === slot.key);
+
+              const slotNameEl = document.createElement('p');
+              slotNameEl.classList.add('label-small', 'inventory_category');
+              slotNameEl.innerText = slot.value;
+              el.appendChild(slotNameEl);
+
+              const itemSlotEl = document.createElement('a');
+              itemSlotEl.addEventListener('click', () => toModalSubMenu(equippedItem));
+              itemSlotEl.setAttribute('href', '#');
+              itemSlotEl.classList.add('inventory_item');
+              
+
+              const itemNameEl = document.createElement('p');
+              itemNameEl.classList.add('label-large');
+              itemNameEl.innerText = equippedItem ? equippedItem.name : 'Nothing';
+              itemSlotEl.appendChild(itemNameEl);
+
+              const itemStatEl = document.createElement('p');
+              itemStatEl.classList.add('label-medium');
+              itemStatEl.innerText = equippedItem ? `${equippedItem.power} ${equippedItem.statType}` : 'N/A';
+              itemSlotEl.appendChild(itemStatEl);
+
+              el.appendChild(itemSlotEl);
+            });
+          },
+        },
+        unequippedItems: {
+          element: unequippedInventoryEl,
+          value: (el, state) => {
+            el.innerHTML = null;
+
+            const unequipped = state.inventory.filter((item) => !item.equipped);
+            unequipped.forEach((item) => {
+              const itemEl = document.createElement('li');
+
+              const itemLinkEl = document.createElement('a');
+              itemLinkEl.addEventListener('click', () => toModalSubMenu(item));
+              itemLinkEl.setAttribute('href', '#');
+              itemLinkEl.classList.add('inventory_item');
+              itemEl.appendChild(itemLinkEl);
+
+              const nameEl = document.createElement('p');
+              nameEl.innerHTML = item.name;
+              nameEl.classList.add('label-large');
+              itemLinkEl.appendChild(nameEl);
+
+              const statEl = document.createElement('p');
+              statEl.innerHTML = `${item.power} ${item.statType}`;
+              statEl.classList.add('label-medium');
+              itemLinkEl.appendChild(statEl);
+
+              el.appendChild(itemEl);
+            });
+          },
+        },
+        inventoryDetailItem: {
+          element: inventoryDetailItemEl,
+          value: (el, state) => {
+            el.innerHTML = null;
+
+            if (!state.inventoryItem) {
+              return;
+            }
+
+            const inventoryItemTypeEl = document.createElement('p');
+            inventoryItemTypeEl.classList.add('label-small', 'inventory_category');
+            inventoryItemTypeEl.innerText = state.inventoryItem.type.type;
+            el.appendChild(inventoryItemTypeEl);
+
+            const inventoryItemInfoContainerEl = document.createElement('div');
+            inventoryItemInfoContainerEl.classList.add('inventory_item', 'inventory_item-border');
+
+            const inventoryItemInfoNameEl = document.createElement('p');
+            inventoryItemInfoNameEl.classList.add('label-large');
+            inventoryItemInfoNameEl.innerText = state.inventoryItem.name;
+            inventoryItemInfoContainerEl.appendChild(inventoryItemInfoNameEl);
+
+            const inventoryItemInfoStatEl = document.createElement('p');
+            inventoryItemInfoStatEl.classList.add('label-medium');
+            inventoryItemInfoStatEl.innerText = `${state.inventoryItem.power} ${state.inventoryItem.statType}`;
+            inventoryItemInfoContainerEl.appendChild(inventoryItemInfoStatEl);
+
+            el.appendChild(inventoryItemInfoContainerEl);
+          },
+        },
+        inventoryDetailActions: {
+          element: inventoryDetailActionsEl,
+          value: (el, state) => {
+            el.innerHTML = null;
+
+            if (!state.inventoryItem) {
+              return;
+            }
+
+            const elements = [];
+
+            const isHandItem = state.inventoryItem.type.type === 'HAND';
+
+            if (isHandItem && !state.inventoryItem.equipped) {
+              const equipLeftActionEl = document.createElement('button');
+              equipLeftActionEl.setAttribute('type', 'button');
+              equipLeftActionEl.classList.add('action_button', 'action_button-hollow');
+              equipLeftActionEl.innerText = 'Equip Left';
+              equipLeftActionEl.addEventListener('click', () => {
+                gameState.setState({
+                  inventory: state.inventory.map((item) => {
+                    if (item === state.inventoryItem) {
+                      return {
+                        ...state.inventoryItem,
+                        equipped: 'LEFT_HAND',
+                      };
+                    }
+                    if (item.equipped === 'LEFT_HAND') {
+                      return {
+                        ...item,
+                        equipped: null,
+                      };
+                    }
+                    return item;
+                  }),
+                  inventoryItem: {
+                    ...state.inventoryItem,
+                    equipped: 'LEFT_HAND',
+                  },
+                });
+                updateUi(gameState.getState());
+                save();
+              });
+              elements.push(equipLeftActionEl);
+
+              const equipRightActionEl = document.createElement('button');
+              equipRightActionEl.setAttribute('type', 'button');
+              equipRightActionEl.classList.add('action_button', 'action_button-hollow');
+              equipRightActionEl.innerText = 'Equip Right';
+              equipRightActionEl.addEventListener('click', () => {
+                gameState.setState({
+                  inventory: state.inventory.map((item) => {
+                    if (item === state.inventoryItem) {
+                      return {
+                        ...state.inventoryItem,
+                        equipped: 'RIGHT_HAND',
+                      };
+                    }
+                    if (item.equipped === 'RIGHT_HAND') {
+                      return {
+                        ...item,
+                        equipped: null,
+                      };
+                    }
+                    return item;
+                  }),
+                  inventoryItem: {
+                    ...state.inventoryItem,
+                    equipped: 'RIGHT_HAND',
+                  },
+                });
+                updateUi(gameState.getState());
+                save();
+              });
+              elements.push(equipRightActionEl);
+            } else if (!state.inventoryItem.equipped) {
+              const equipActionEl = document.createElement('button');
+              equipActionEl.setAttribute('type', 'button');
+              equipActionEl.classList.add('action_button', 'action_button-hollow');
+              equipActionEl.innerText = 'Equip';
+              equipActionEl.addEventListener('click', () => {
+                gameState.setState({
+                  inventory: state.inventory.map((item) => {
+                    if (item === state.inventoryItem) {
+                      return {
+                        ...state.inventoryItem,
+                        equipped: state.inventoryItem.type.type,
+                      };
+                    }
+                    if (item.equipped === state.inventoryItem.type.type) {
+                      return {
+                        ...item,
+                        equipped: null,
+                      };
+                    }
+                    return item;
+                  }),
+                  inventoryItem: {
+                    ...state.inventoryItem,
+                    equipped: state.inventoryItem.type.type,
+                  },
+                });
+                updateUi(gameState.getState());
+                save();
+              });
+              elements.push(equipActionEl);
+            } else {
+              const equipActionEl = document.createElement('button');
+              equipActionEl.setAttribute('type', 'button');
+              equipActionEl.classList.add('action_button', 'action_button-hollow');
+              equipActionEl.innerText = 'Unequip';
+              equipActionEl.addEventListener('click', () => {
+                gameState.setState({
+                  inventory: state.inventory.map((item) => {
+                    if (item === state.inventoryItem) {
+                      return {
+                        ...state.inventoryItem,
+                        equipped: null,
+                      };
+                    }
+                    return item;
+                  }),
+                  inventoryItem: {
+                    ...state.inventoryItem,
+                    equipped: null,
+                  },
+                });
+                updateUi(gameState.getState());
+                save();
+              });
+              elements.push(equipActionEl);
+            }
+            elements.forEach((newElement) => { el.appendChild(newElement); });
+          },
+        },
+      };
+      const updateUi = (currentState) => {
+        Object.values(UI).forEach(item => {
+          item.value(item.element, currentState);
+        });
+      };
+
+      // actions
       attackButtonEl.addEventListener('mousedown', onAttack);
       attackButtonEl.addEventListener('touchstart', onAttack);
       attackButtonEl.addEventListener('mouseup', tick);
       attackButtonEl.addEventListener('touchend', tick);
+      inventoryButtonEl.addEventListener('click', () => {
+        inventoryModalEl.classList.add('modal-visible');
+      });
+      inventoryCloseEl.addEventListener('click', () => {
+        inventoryModalEl.classList.remove('modal-visible');
+      });
+      function toModalSubMenu(item) {
+        gameState.setState({ inventoryItem: item });
+        updateUi(gameState.getState());
+        inventoryModalEl.classList.add('modal-sub');
+        inventoryDetailModalEl.classList.add('modal-visible');
+      }
+      inventoryDetailCloseEl.addEventListener('click', () => {
+        inventoryModalEl.classList.remove('modal-sub');
+        inventoryDetailModalEl.classList.remove('modal-visible');
+        gameState.setState({ inventoryItem: null });
+        updateUi(gameState.getState());
+      });
 
 
-      // init
+      /* INIT GAME */
       load();
     </script>
   </body>
