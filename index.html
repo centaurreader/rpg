@@ -808,7 +808,11 @@
               const equipActionEl = document.createElement('button');
               equipActionEl.setAttribute('type', 'button');
               equipActionEl.classList.add('action_button', 'action_button-hollow');
-              equipActionEl.innerText = 'Unequip';
+              if (state.inventoryItem.equipped.includes('HAND')) {
+                equipActionEl.innerText = state.inventoryItem.equipped.includes('LEFT') ? 'Unequip Left' : 'Unequip Right';
+              } else {
+                equipActionEl.innerText = 'Unequip';
+              }
               equipActionEl.addEventListener('click', () => {
                 gameState.setState({
                   inventory: state.inventory.map((item) => {
