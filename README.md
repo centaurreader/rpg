@@ -21,6 +21,7 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [ ] Make it display correctly on phones (prevent double tap zooming?)
 - [ ] (bug) Sometimes enemies are level 0
 - [ ] (bug) Enemies are sometimes too high level for player level
+- [ ] Trash inventory items
 
 ### v2
 - [ ] Sell inventory items for GP
