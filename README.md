@@ -3,6 +3,7 @@
 RPG gameplay distilled to its purest essence. [Play the game](https://centaurreader.com/rpg).
 
 ## TODO
+### v1
 - [x] Save
 - [x] Load
 - [x] Scale XP requirement per level
@@ -18,5 +19,7 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
   - [x] deal weapon damage
 - [ ] Make gear affect HP, Receive damage from monster when attacking; add death state
 - [ ] Make it display correctly on phones (prevent double tap zooming?)
+
+### v2
 - [ ] Sell inventory items for GP
 - [ ] Buy items with GP
