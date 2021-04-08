@@ -9,7 +9,7 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [x] Scale XP requirement per level
 - [x] Randomly generate monster with stats (appropriate for level)
 - [x] Make monsters take damage (and make player miss them sometimes)
-- [ ] Add stats to gear, equip gear, augment player stats (damage)
+- [x] Add stats to gear, equip gear, augment player stats (damage)
   - [x] inventory UI
   - [x] open inventory
   - [x] close inventory
@@ -23,3 +23,5 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 ### v2
 - [ ] Sell inventory items for GP
 - [ ] Buy items with GP
+- [ ] Show damage when you click
+- [ ] Show death animation for monsters
