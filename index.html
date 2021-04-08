@@ -285,9 +285,15 @@
       function save() {
         localStorage.setItem(SAVE_KEY, JSON.stringify(gameState.getState()));
       }
+      function validateGameData(data) {
+        return {
+          ...data,
+          inventory: (data.inventory || []).filter((item) => typeof item === 'object'),
+        };
+      }
       function load() {
         try {
-          gameState.setState(JSON.parse(localStorage.getItem(SAVE_KEY)));
+          gameState.setState(validateGameData(JSON.parse(localStorage.getItem(SAVE_KEY))));
           if (!gameState.getState().enemy) {
             genEnemy();
           }
