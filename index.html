@@ -443,26 +443,26 @@
       const enemyTable = [
         [
           { name: 'Beautiful', modifier: 2 },
-          { name: 'Berserk', modifier: 5 },
+          { name: 'Berserk', modifier: 4 },
           { name: 'Bored', modifier: 1 },
           { name: 'Brilliant', modifier: 2 },
-          { name: 'Cursed', modifier: 10 },
-          { name: 'Dark', modifier: 9 },
-          { name: 'Drunk', modifier: 6 },
-          { name: 'Dull', modifier: 5 },
-          { name: 'Dumpy', modifier: 2 },
-          { name: 'Fat', modifier: 3 },
-          { name: 'Light', modifier: 4 },
-          { name: 'Mystic', modifier: 8 },
-          { name: 'Raging', modifier: 7 },
-          { name: 'Skinny', modifier: 2 },
-          { name: 'Stinky', modifier: 5 },
-          { name: 'Stoned', modifier: 2 },
-          { name: 'Ugly', modifier: 8 },
-          { name: 'Wretched', modifier: 9 },
+          { name: 'Cursed', modifier: 4 },
+          { name: 'Dark', modifier: 3 },
+          { name: 'Drunk', modifier: 2 },
+          { name: 'Dull', modifier: 1 },
+          { name: 'Dumpy', modifier: 1 },
+          { name: 'Fat', modifier: 2 },
+          { name: 'Light', modifier: 3 },
+          { name: 'Mystic', modifier: 4 },
+          { name: 'Raging', modifier: 3 },
+          { name: 'Skinny', modifier: 1 },
+          { name: 'Stinky', modifier: 2 },
+          { name: 'Stoned', modifier: 1 },
+          { name: 'Ugly', modifier: 2 },
+          { name: 'Wretched', modifier: 3 },
         ],
         [
-          { name: 'Orc', modifier: 10, },
+          { name: 'Orc', modifier: 2, },
         ],
       ];
       const getEnemyLevelForPlayerLevel = (level) => {
@@ -510,7 +510,7 @@
               quality: lootTable[0][cat1],
               type: lootTable[1][cat2],
               power: (lootTable[0][cat1].modifier * lootTable[1][cat2].modifier) + 10,
-              statType: lootTable[1][cat2].statType || type === 'HAND' ? 'Damage' : 'HP',
+              statType: lootTable[1][cat2].statType,
               equipped: null,
             },
           ],
@@ -882,11 +882,7 @@
               const equipActionEl = document.createElement('button');
               equipActionEl.setAttribute('type', 'button');
               equipActionEl.classList.add('action_button', 'action_button-hollow');
-              if (state.inventoryItem.equipped.includes('HAND')) {
-                equipActionEl.innerText = state.inventoryItem.equipped.includes('LEFT') ? 'Unequip Left' : 'Unequip Right';
-              } else {
-                equipActionEl.innerText = 'Unequip';
-              }
+              equipActionEl.innerText = 'Unequip';
               equipActionEl.addEventListener('click', () => {
                 gameState.setState({
                   inventory: state.inventory.map((item) => {
