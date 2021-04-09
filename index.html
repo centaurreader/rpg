@@ -11,6 +11,31 @@
     <link rel="stylesheet" href="reset.css">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;900&display=swap" rel="stylesheet">
+
+    <!-- generics -->
+    <link rel="icon" href="favicons/favicon-32.png" sizes="32x32">
+    <link rel="icon" href="favicons/favicon-57.png" sizes="57x57">
+    <link rel="icon" href="favicons/favicon-76.png" sizes="76x76">
+    <link rel="icon" href="favicons/favicon-96.png" sizes="96x96">
+    <link rel="icon" href="favicons/favicon-128.png" sizes="128x128">
+    <link rel="icon" href="favicons/favicon-192.png" sizes="192x192">
+    <link rel="icon" href="favicons/favicon-228.png" sizes="228x228">
+    
+    <!-- Android -->
+    <link rel="shortcut icon" sizes="196x196" href=“favicons/favicon-196.png">
+    
+    <!-- iOS -->
+    <link rel="apple-touch-icon" href="favicons/favicon-120.png" sizes="120x120">
+    <link rel="apple-touch-icon" href="path/to/favicon-152.png" sizes="152x152">
+    <link rel="apple-touch-icon" href="path/to/favicon-180.png" sizes="180x180">
+    
+    <!-- Windows 8 IE 10-->
+    <meta name="msapplication-TileColor" content="#2f2c2c">
+    <meta name="msapplication-TileImage" content="favicons/favicon-144.png">
+    
+    <!— Windows 8.1 + IE11 and above —>
+    <meta name="msapplication-config" content="favicons/browserconfig.xml" />
+
     <style>
       * { box-sizing: border-box; }
       body {
@@ -23,6 +48,8 @@
       #loot { min-height: 1rem; }
 
       .title {
+        display: flex;
+        align-items: center;
         max-width: 448px;
         margin: 0 auto;
         font-size: .75rem;
@@ -207,7 +234,11 @@
   </head>
   <body>
     <div class="app">
-      <h1 class="title">Murder Death Click</h1>
+      <h1 class="title">
+        <img src="helmet.png" height="16" alt="" />
+        &nbsp;
+        Murder Death Click
+      </h1>
       <ul class="toolbar">
         <li class="toolbar--item">
           <a href="#" id="inventory_button">

@@ -20,6 +20,7 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [x] (bug) Games without stored data crash on trying to filter the inventory
 - [x] (bug) On mobile tapping attack causes the event to fire twice
 - [x] Make it display correctly on phones
+- [x] favicon
 - [ ] Make gear affect HP, Receive damage from monster when attacking; add death state
 - [ ] (bug) Sometimes enemies are level 0
 - [ ] (bug) Enemies are sometimes too high level for player level
