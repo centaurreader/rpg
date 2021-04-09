@@ -22,9 +22,16 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [x] Make it display correctly on phones
 - [x] favicon
 - [ ] Make gear affect HP, Receive damage from monster when attacking; add death state
+  - [x] calc damage savings from gear
+  - [x] display HP
+  - [x] roll enemy attack damage; miss chance
+  - [x] apply damage to HP; display damage taken
+  - [x] warn when close to dead
+  - [ ] die when hp is <= 0
+- [ ] Make leveling increase base HP; heal player for diff of HP gain
+- [ ] Trash inventory items
 - [ ] (bug) Sometimes enemies are level 0
 - [ ] (bug) Enemies are sometimes too high level for player level
-- [ ] Trash inventory items
 
 ### v2
 - [ ] Sell inventory items for GP
