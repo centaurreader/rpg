@@ -623,9 +623,10 @@
             updateUi(gameState.getState());
             save();
           }, 250);
+        } else {
+          updateUi(gameState.getState());
+          save();
         }
-        updateUi(gameState.getState());
-        save();
       }
 
       /*
