@@ -17,9 +17,10 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
   - [x] equip items
   - [x] unequip items
   - [x] deal weapon damage
-- [ ] (bug) Games without stored data crash on trying to filter the inventory
+- [x] (bug) Games without stored data crash on trying to filter the inventory
+- [x] (bug) On mobile tapping attack causes the event to fire twice
+- [x] Make it display correctly on phones
 - [ ] Make gear affect HP, Receive damage from monster when attacking; add death state
-- [ ] Make it display correctly on phones (prevent double tap zooming?)
 - [ ] (bug) Sometimes enemies are level 0
 - [ ] (bug) Enemies are sometimes too high level for player level
 - [ ] Trash inventory items

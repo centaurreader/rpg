@@ -23,10 +23,14 @@
       #loot { min-height: 1rem; }
 
       .title {
-        font-size: 2.75rem;
+        max-width: 448px;
+        margin: 0 auto;
+        font-size: .75rem;
         font-weight: 900;
-        margin-bottom: 1rem;
-        text-align: center;
+        padding: 1rem;
+        background-color: #f6e8e8;
+        color: #2f2c2c;
+        border-bottom: 2px solid #2f2c2c;
       }
       .main_container {
         border: 10px solid #f6e8e8;
@@ -188,47 +192,60 @@
       .inventory_item-border {
         border-bottom: 2px solid #f6e8e8;
       }
+
+      .app {
+        margin: 0 auto;
+        max-width: 458px;
+        overflow-x: hidden;
+      }
+      @media screen and (min-width: 550px) {
+        .app {
+          max-width: 550px;
+        }
+      }
     </style>
   </head>
   <body>
-    <h1 class="title">Murder Death Click</h1>
-    <ul class="toolbar">
-      <li class="toolbar--item">
-        <a href="#" id="inventory_button">
-          <img src="inventory.gif" alt="Inventory" />
-        </a>
-      </li>
-    </ul>
-    <div id="dungeon" class="main_container">
-      <section class="info_area info_area-player">
-        <h2 class="visually_hidden">Player</h2>
-        <p id="level" class="label-large">Level 1</p>
-        <div class="bar">
-          <div class="bar_filler" id="xp_status"></div>
+    <div class="app">
+      <h1 class="title">Murder Death Click</h1>
+      <ul class="toolbar">
+        <li class="toolbar--item">
+          <a href="#" id="inventory_button">
+            <img src="inventory.gif" alt="Inventory" />
+          </a>
+        </li>
+      </ul>
+      <div id="dungeon" class="main_container">
+        <section class="info_area info_area-player">
+          <h2 class="visually_hidden">Player</h2>
+          <p id="level" class="label-large">Level 1</p>
+          <div class="bar">
+            <div class="bar_filler" id="xp_status"></div>
+          </div>
+          <p class="label-medium" id="xp">0 / XXX xp</p>
+        </section>
+  
+        <div class="graphics_area">
+          <img class="sprite sprite-hero" src="hero.gif" alt="" />
+          <img id="attack" class="sprite sprite-attack" src="attack.gif" alt="" />
+          <img id="miss" class="sprite sprite-attack" src="miss.gif" alt="" />
+          <img id="enemy" class="sprite sprite-enemy" src="enemy.gif" alt="" />
+          <img class="sprite sprite-background" src="floor.gif" alt="" />
         </div>
-        <p class="label-medium" id="xp">0 / XXX xp</p>
-      </section>
-
-      <div class="graphics_area">
-        <img class="sprite sprite-hero" src="hero.gif" alt="" />
-        <img id="attack" class="sprite sprite-attack" src="attack.gif" alt="" />
-        <img id="miss" class="sprite sprite-attack" src="miss.gif" alt="" />
-        <img id="enemy" class="sprite sprite-enemy" src="enemy.gif" alt="" />
-        <img class="sprite sprite-background" src="floor.gif" alt="" />
+  
+        <section class="info_area info_area-enemy">
+          <h2 class="visually_hidden">Enemy</h2>
+          <p class="label-large"><span id="enemy_level">Level 1</span> <span id="enemy_name">Fat Orc</span></p>
+          <div class="bar">
+            <div class="bar_filler" id="enemy_hp_status"></div>
+          </div>
+          <p class="label-medium" id="enemy_hp">0 / XXX hp</p>
+          <p class="label-small" id="loot"></p>
+        </section>
+  
       </div>
-
-      <section class="info_area info_area-enemy">
-        <h2 class="visually_hidden">Enemy</h2>
-        <p class="label-large"><span id="enemy_level">Level 1</span> <span id="enemy_name">Fat Orc</span></p>
-        <div class="bar">
-          <div class="bar_filler" id="enemy_hp_status"></div>
-        </div>
-        <p class="label-medium" id="enemy_hp">0 / XXX hp</p>
-        <p class="label-small" id="loot"></p>
-      </section>
-
+      <button id="attack_action" class="action_button" type="button">Attack</button>
     </div>
-    <button id="attack_action" class="action_button" type="button">Attack</button>
 
     <section id="inventory" class="modal">
       <div class="modal_inner">
@@ -845,9 +862,11 @@
       };
 
       // actions
-      attackButtonEl.addEventListener('mousedown', onAttack);
+      if (typeof window.ontouchstart === 'undefined') {
+        attackButtonEl.addEventListener('mousedown', onAttack);
+        attackButtonEl.addEventListener('mouseup', tick);
+      }
       attackButtonEl.addEventListener('touchstart', onAttack);
-      attackButtonEl.addEventListener('mouseup', tick);
       attackButtonEl.addEventListener('touchend', tick);
       inventoryButtonEl.addEventListener('click', () => {
         inventoryModalEl.classList.add('modal-visible');
