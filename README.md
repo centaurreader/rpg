@@ -21,17 +21,18 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [x] (bug) On mobile tapping attack causes the event to fire twice
 - [x] Make it display correctly on phones
 - [x] favicon
+- [x] (bug) Sometimes enemies are level 0
+- [x] (bug) Enemies are sometimes too high level for player level
 - [ ] Make gear affect HP, Receive damage from monster when attacking; add death state
   - [x] calc damage savings from gear
   - [x] display HP
   - [x] roll enemy attack damage; miss chance
   - [x] apply damage to HP; display damage taken
   - [x] warn when close to dead
-  - [ ] die when hp is <= 0
+  - [ ] die when hp is <= 0; you died / new game menu
 - [ ] Make leveling increase base HP; heal player for diff of HP gain
 - [ ] Trash inventory items
-- [ ] (bug) Sometimes enemies are level 0
-- [ ] (bug) Enemies are sometimes too high level for player level
+- [ ] show enemy hp drain to 0 before spawning new
 
 ### v2
 - [ ] Sell inventory items for GP

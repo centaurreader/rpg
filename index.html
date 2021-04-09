@@ -466,8 +466,8 @@
         ],
       ];
       const getEnemyLevelForPlayerLevel = (level) => {
-        const diff = Math.ceil(Math.random() * 10);
-        return Math.abs(diff > 5 ? level + diff : level - diff);
+        const diff = Math.floor(Math.random() * 4);
+        return Math.abs(diff >= 2 ? level + Math.ceil(diff / 2) : level - diff);
       };
       const getXpForLevel = (level) => {
         const translation = 100;
@@ -534,7 +534,7 @@
         gameState.setState({
           enemy: {
             name: `${type.name} ${enemy.name}`,
-            level,
+            level: level === 0 ? 1 : level,
             hp: type.modifier * enemy.modifier,
             maxHp: type.modifier * enemy.modifier,
             damage: type.modifier + (enemy.damage || 10),
