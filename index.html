@@ -287,8 +287,8 @@
       }
       function validateGameData(data) {
         return {
-          ...data,
-          inventory: (data.inventory || []).filter((item) => typeof item === 'object'),
+          ...(data || {}),
+          inventory: ((data || {}).inventory || []).filter((item) => typeof item === 'object'),
         };
       }
       function load() {
