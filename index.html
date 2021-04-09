@@ -705,16 +705,16 @@
         lootDrop: {
           element: lootDropEl,
           value: (() => {
-            let lastLoot;
+            let lastLootIndex;
             return (el, state) => {
-              const newestLoot = state.inventory[state.inventory.length - 1];
-              if (lastLoot !== newestLoot) {
+              if (state.inventory.length - 1 > lastLootIndex) {
+                const newestLoot = state.inventory[state.inventory.length - 1];
                 loot.innerHTML = `Dropped: ${newestLoot.name}`;
                 setTimeout(() => {
                   loot.innerHTML = '';
                 }, 2000);
               }
-              lastLoot = newestLoot;
+              lastLootIndex = state.inventory.length - 1;
             };
           })(),
         },
@@ -911,6 +911,19 @@
               });
               elements.push(equipActionEl);
             }
+
+            const trashItemEl = document.createElement('button');
+            trashItemEl.setAttribute('type', 'button');
+            trashItemEl.classList.add('action_button', 'action_button-hollow');
+            trashItemEl.innerText = 'Discard';
+            trashItemEl.addEventListener('click', () => {
+              gameState.setState({
+                inventory: gameState.getState().inventory.filter((item) => item !== state.inventoryItem),
+              });
+              fromModalSubMenu();
+            });
+            elements.push(trashItemEl);
+
             elements.forEach((newElement) => { el.appendChild(newElement); });
           },
         },
@@ -940,12 +953,13 @@
         inventoryModalEl.classList.add('modal-sub');
         inventoryDetailModalEl.classList.add('modal-visible');
       }
-      inventoryDetailCloseEl.addEventListener('click', () => {
+      function fromModalSubMenu() {
         inventoryModalEl.classList.remove('modal-sub');
         inventoryDetailModalEl.classList.remove('modal-visible');
         gameState.setState({ inventoryItem: null });
         updateUi(gameState.getState());
-      });
+      }
+      inventoryDetailCloseEl.addEventListener('click', fromModalSubMenu);
       function showWound(text) {
         woundIndicatorEl.innerText = text;
         woundIndicatorEl.classList.add('wound-lit');
