@@ -23,6 +23,7 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [x] favicon
 - [x] (bug) Sometimes enemies are level 0
 - [x] (bug) Enemies are sometimes too high level for player level
+- [x] show enemy hp drain to 0 before spawning new
 - [ ] Make gear affect HP, Receive damage from monster when attacking; add death state
   - [x] calc damage savings from gear
   - [x] display HP
@@ -32,7 +33,6 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
   - [ ] die when hp is <= 0; you died / new game menu
 - [ ] Make leveling increase base HP; heal player for diff of HP gain
 - [ ] Trash inventory items
-- [ ] show enemy hp drain to 0 before spawning new
 
 ### v2
 - [ ] Sell inventory items for GP

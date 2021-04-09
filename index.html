@@ -561,10 +561,11 @@
       };
       const reduceEnemyHp = (damage) => {
         const { enemy } = gameState.getState();
+        const newHp = enemy.hp - damage;
         gameState.setState({
           enemy: {
             ...enemy,
-            hp: enemy.hp - damage,
+            hp: newHp <= 0 ? 0 : newHp,
           },
         });
       };
@@ -612,11 +613,16 @@
         }
         reduceEnemyHp(damageDone);
         if (gameState.getState().enemy.hp <= 0) {
-          calcXp();
-          calcLevel();
-          lootProc();
-          calcGp();
-          genEnemy();
+          enemyHpStatusEl.setAttribute('style', 'width: 0');
+          setTimeout(() => {
+            calcXp();
+            calcLevel();
+            lootProc();
+            calcGp();
+            genEnemy();
+            updateUi(gameState.getState());
+            save();
+          }, 250);
         }
         updateUi(gameState.getState());
         save();
