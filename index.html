@@ -38,6 +38,16 @@
 
     <style>
       * { box-sizing: border-box; }
+
+      html {
+        font-size: 75%;
+      }
+      @media screen and (min-height: 800px) {
+        html {
+          font-size: 100%;
+        }
+      }
+
       body {
         background-color: #2f2c2c;
         color: #f6e8e8;
@@ -53,7 +63,7 @@
         height: 100%;
         padding-left: .5rem;
         max-width: 448px;
-        font-size: .75rem;
+        font-size: .825rem;
         font-weight: 900;
         background-color: #f6e8e8;
         color: #2f2c2c;
@@ -287,7 +297,7 @@
         </li>
         <li class="toolbar--item">
           <a href="#" id="inventory_button">
-            <img src="inventory.gif" alt="Inventory" />
+            <img src="inventory.gif" alt="Inventory" height="32" />
           </a>
         </li>
       </ul>
