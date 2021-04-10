@@ -40,6 +40,7 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [x] Open the game menu from mid-game; add continue button if game is in progress
 
 ### v2
+- [ ] Scale inventory items with progression
 - [ ] Sell inventory items for GP
 - [ ] Buy items with GP
 - [ ] Show damage when you click
