@@ -116,6 +116,7 @@
         font-size: 1.5rem;
         margin-bottom: .5rem;
       }
+      .label-center { text-align: center; }
       .label-medium {
         font-weight: 500;
         font-size: 1.25rem;
@@ -187,6 +188,9 @@
         max-width: 448px;
         padding: 1rem;
       }
+      .modal_inner-no_fill {
+        display: inherit;
+      }
       #gp {
         text-align: right;
         margin-top: 1rem;
@@ -199,6 +203,7 @@
         padding: 12px;
         overflow-y: auto;
         margin-top: 1rem;
+        background-color: #2f2c2c;
       }
       .container_fill {
         flex: 1;
@@ -249,6 +254,14 @@
         opacity: 0;
         transition: transform .75s, opacity .75s;
         transition-delay: .125s;
+      }
+
+      .game_menu_background {
+        background-image: url('brick-pattern.gif');
+      }
+      .game_menu_logo {
+        align-self: center;
+        margin: .5rem 0;
       }
     </style>
   </head>
@@ -330,6 +343,17 @@
       </div>
     </section>
 
+    <section id="game_menu" class="modal modal-visible">
+      <div class="modal_inner modal_inner-no_fill game_menu_background">
+        <div class="container container-no_fill">
+          <img class="game_menu_logo" src="helmet.png" height="32" width="32" alt="" />
+          <h1 id="game_menu_title" class="label-large label-center">Murder Death Click</h1>
+          <p id="game_menu_description" class="label-small label-center">Murder Orcs. Get Loot. Level Up.</p>
+        </div>
+        <button id="game_menu_button" class="action_button" type="button">New Game</button>
+      </div>
+    </section>
+
     <script>
       /*
         //////////
@@ -348,6 +372,7 @@
           inventory: [],
           enemy: null,
           inventoryItem: null,
+          killCount: 0,
         };
         this.getState = () => state;
         this.setState = incoming => {
@@ -363,7 +388,9 @@
         localStorage.setItem(SAVE_KEY, JSON.stringify(gameState.getState()));
       }
       function validateGameData(data) {
+        const tempState = new State();
         return {
+          ...tempState.getState(),
           ...(data || {}),
           inventory: ((data || {}).inventory || []).filter((item) => typeof item === 'object'),
         };
@@ -391,53 +418,53 @@
       ];
       const lootTable = [
           [
-              { name: 'Amazing', modifier: 9, statType: 'HP' },
-              { name: 'Bad', modifier: 3, statType: 'HP' },
-              { name: 'Broken', modifier: 1, statType: 'HP' },
-              { name: 'Cheap', modifier: 2, statType: 'HP' },
-              { name: 'Cool', modifier: 8,  statType: 'HP'},
-              { name: 'Crappy', modifier: 3, statType: 'HP', },
-              { name: 'Dank', modifier: 10, statType: 'HP' },
-              { name: 'Fancy', modifier: 6, statType: 'HP' },
-              { name: 'Heavy', modifier: 7, statType: 'HP' },
-              { name: 'Magic', modifier: 9, statType: 'HP' },
-              { name: 'Shiny', modifier: 4, statType: 'HP' },
-              { name: 'Ugly', modifier: 3, statType: 'HP' },
-              { name: 'Worthless', modifier: 1, statType: 'HP' },
+              { name: 'Amazing', modifier: 9, statType: 'Armor' },
+              { name: 'Bad', modifier: 3, statType: 'Armor' },
+              { name: 'Broken', modifier: 1, statType: 'Armor' },
+              { name: 'Cheap', modifier: 2, statType: 'Armor' },
+              { name: 'Cool', modifier: 8,  statType: 'Armor'},
+              { name: 'Crappy', modifier: 3, statType: 'Armor', },
+              { name: 'Dank', modifier: 10, statType: 'Armor' },
+              { name: 'Fancy', modifier: 6, statType: 'Armor' },
+              { name: 'Heavy', modifier: 7, statType: 'Armor' },
+              { name: 'Magic', modifier: 9, statType: 'Armor' },
+              { name: 'Shiny', modifier: 4, statType: 'Armor' },
+              { name: 'Ugly', modifier: 3, statType: 'Armor' },
+              { name: 'Worthless', modifier: 1, statType: 'Armor' },
           ],
           [
-            { name: 'Boots', type: 'FEET', modifier: 5, statType: 'HP' },
-            { name: 'Clogs', type: 'FEET', modifier: 3, statType: 'HP' },
-            { name: 'Sandals', type: 'FEET', modifier: 2, statType: 'HP' },
-            { name: 'Shoes', type: 'FEET', modifier: 4, statType: 'HP' },
+            { name: 'Boots', type: 'FEET', modifier: 5, statType: 'Armor' },
+            { name: 'Clogs', type: 'FEET', modifier: 3, statType: 'Armor' },
+            { name: 'Sandals', type: 'FEET', modifier: 2, statType: 'Armor' },
+            { name: 'Shoes', type: 'FEET', modifier: 4, statType: 'Armor' },
 
-            { name: 'Pants', type: 'LEGS', modifier: 3, statType: 'HP' },
-            { name: 'Loin Cloth', type: 'LEGS', modifier: 1, statType: 'HP' },
-            { name: 'Skirt', type: 'LEGS', modifier: 2, statType: 'HP' },
-            { name: 'Leggings', type: 'LEGS', modifier: 2, statType: 'HP' },
+            { name: 'Pants', type: 'LEGS', modifier: 3, statType: 'Armor' },
+            { name: 'Loin Cloth', type: 'LEGS', modifier: 1, statType: 'Armor' },
+            { name: 'Skirt', type: 'LEGS', modifier: 2, statType: 'Armor' },
+            { name: 'Leggings', type: 'LEGS', modifier: 2, statType: 'Armor' },
 
-            { name: 'Cap', type: 'HEAD', modifier: 2, statType: 'HP' },
-            { name: 'Hat', type: 'HEAD', modifier: 3, statType: 'HP' },
-            { name: 'Helmet', type: 'HEAD', modifier: 5, statType: 'HP' },
-            { name: 'Ribbon', type: 'HEAD', modifier: 1, statType: 'HP' },
+            { name: 'Cap', type: 'HEAD', modifier: 2, statType: 'Armor' },
+            { name: 'Hat', type: 'HEAD', modifier: 3, statType: 'Armor' },
+            { name: 'Helmet', type: 'HEAD', modifier: 5, statType: 'Armor' },
+            { name: 'Ribbon', type: 'HEAD', modifier: 1, statType: 'Armor' },
 
-            { name: 'Chainmail', type: 'BODY', modifier: 6, statType: 'HP' },
-            { name: 'Cuirass', type: 'BODY', modifier: 5, statType: 'HP' },
-            { name: 'Doublet', type: 'BODY', modifier: 3, statType: 'HP' },
-            { name: 'Shirt', type: 'BODY', modifier: 2, statType: 'HP' },
+            { name: 'Chainmail', type: 'BODY', modifier: 6, statType: 'Armor' },
+            { name: 'Cuirass', type: 'BODY', modifier: 5, statType: 'Armor' },
+            { name: 'Doublet', type: 'BODY', modifier: 3, statType: 'Armor' },
+            { name: 'Shirt', type: 'BODY', modifier: 2, statType: 'Armor' },
 
             { name: 'Axe', type: 'HAND', modifier: 10, statType: 'Damage' },
             { name: 'Bow', type: 'HAND', modifier: 3, statType: 'Damage' },
-            { name: 'Buckler', type: 'HAND', modifier: 2, statType: 'HP' },
+            { name: 'Buckler', type: 'HAND', modifier: 2, statType: 'Armor' },
             { name: 'Flail', type: 'HAND', modifier: 6, statType: 'Damage' },
             { name: 'Hammer', type: 'HAND', modifier: 5, statType: 'Damage' },
-            { name: 'Heater', type: 'HAND', modifier: 5, statType: 'HP', },
+            { name: 'Heater', type: 'HAND', modifier: 5, statType: 'Armor', },
             { name: 'Lance', type: 'HAND', modifier: 4, statType: 'Damage' },
             { name: 'Mace', type: 'HAND', modifier: 5, statType: 'Damage' },
             { name: 'Scepter', type: 'HAND', modifier: 3, statType: 'Damage' },
             { name: 'Staff', type: 'HAND', modifier: 2, statType: 'Damage' },
             { name: 'Sword', type: 'HAND', modifier: 7, statType: 'Damage' },
-            { name: 'Tower Shield', type: 'HAND', modifier: 10, statType: 'HP' },
+            { name: 'Tower Shield', type: 'HAND', modifier: 10, statType: 'Armor' },
           ],
       ];
       const enemyTable = [
@@ -553,7 +580,7 @@
       };
       const calcWounds = (damage) => {
         const { hp, inventory } = gameState.getState();
-        const equippedHpItems = inventory.filter((item) => item.statType === 'HP' && !!item.equipped);
+        const equippedHpItems = inventory.filter((item) => item.statType === 'Armor' && !!item.equipped);
         const armorRating = equippedHpItems.reduce((total, item) => item.power + total, 0);
         const damageMod = armorRating / 10;
         const calcDamage = damage - damageMod;
@@ -598,6 +625,11 @@
         updateUi(gameState.getState());
         save();
       }
+      function incrementKillCount() {
+        gameState.setState({
+          killCount: gameState.getState().killCount + 1,
+        });
+      }
       function tick() {
         attack.setAttribute('style', 'visibility: hidden');
 
@@ -615,6 +647,7 @@
         if (gameState.getState().enemy.hp <= 0) {
           enemyHpStatusEl.setAttribute('style', 'width: 0');
           setTimeout(() => {
+            incrementKillCount();
             calcXp();
             calcLevel();
             lootProc();
@@ -626,6 +659,18 @@
         } else {
           updateUi(gameState.getState());
           save();
+        }
+
+        if (gameState.getState().wounds >= gameState.getState().hp) {
+          attackButtonEl.setAttribute('disabled', 'true');
+          setTimeout(() => {
+            gameMenuTitleEl.innerText = 'You died';
+            const killCount = new Intl.NumberFormat(navigator.language).format(gameState.getState().killCount);
+            gameMenuDescriptionEl.innerText = `after murdering ${killCount} orcs.`;
+            localStorage.removeItem('rpg-state');
+            gameMenuModalEl.classList.add('modal-visible');
+            save();
+          }, 1000);
         }
       }
 
@@ -660,6 +705,11 @@
       const unequippedInventoryEl = document.getElementById('unequipped_items');
       const inventoryDetailItemEl = document.getElementById('inventory_detail_item');
       const inventoryDetailActionsEl = document.getElementById('inventory_detail_actions');
+      // game menu
+      const gameMenuModalEl = document.getElementById('game_menu');
+      const gameMenuTitleEl = document.getElementById('game_menu_title');
+      const gameMenuDescriptionEl = document.getElementById('game_menu_description');
+      const gameMenuButtonEl = document.getElementById('game_menu_button');
 
       // data binding
       const UI = {
@@ -678,7 +728,8 @@
         hp: {
           element: hpEl,
           value: (el, state) => {
-            const currentHp = new Intl.NumberFormat(navigator.language).format(state.hp - state.wounds);
+            const calcdHp = state.hp - state.wounds;
+            const currentHp = new Intl.NumberFormat(navigator.language).format(calcdHp < 0 ? 0 : calcdHp);
             const totalHp = new Intl.NumberFormat(navigator.language).format(state.hp);
             el.innerHTML = `${currentHp} / ${totalHp} hp`;
           },
@@ -687,6 +738,8 @@
           const percent = (state.hp - state.wounds) / state.hp;
           if (percent < .25) {
             el.classList.add('bar_filler-danger');
+          } else {
+            el.classList.remove('bar_filler-danger');
           }
           el.setAttribute('style', `width: ${percent * 100}%`);
         }, },
@@ -935,6 +988,11 @@
       };
 
       // actions
+      gameMenuButtonEl.addEventListener('click', () => {
+        localStorage.removeItem('rpg-state');
+        load();
+        gameMenuModalEl.classList.remove('modal-visible');
+      });
       if (typeof window.ontouchstart === 'undefined') {
         attackButtonEl.addEventListener('mousedown', onAttack);
         attackButtonEl.addEventListener('mouseup', tick);
@@ -971,6 +1029,12 @@
 
 
       /* INIT GAME */
+      function continueIf() {
+        if (localStorage.getItem(SAVE_KEY)) {
+          gameMenuModalEl.classList.remove('modal-visible');
+        }
+      }
+      continueIf();
       load();
     </script>
   </body>
