@@ -524,7 +524,7 @@
       const calcLevel = () => {
         const { xp, level, hp, wounds } = gameState.getState();
         const shouldLevelUp = xp >= getXpForLevel(level);
-        const hpIfLevelUp = hp + ((level + 1) * 10);
+        const hpIfLevelUp = hp + ((level + 1) * 4);
         const woundsIfLevelUp = wounds - (hpIfLevelUp - hp) < 0 ? 0 : wounds - (hpIfLevelUp - hp);
         gameState.setState({
           level: shouldLevelUp ? level + 1 : level,
@@ -1009,7 +1009,7 @@
         continueButton: {
           element: gameMenuContinueButtonEl,
           value: (el, state) => {
-            if (state.wounds < state.hp) {
+            if (state.wounds < state.hp && state.killCount > 0) {
               el.classList.remove('action_button-hidden');
             } else {
               el.classList.add('action_button-hidden');
