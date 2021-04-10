@@ -161,8 +161,11 @@
       .action_button:disabled {
         opacity: .25;
       }
+      .action_button-hidden {
+        display: none;
+      }
       .action_button-hollow {
-        background-color: transparent;
+        background-color: #2f2c2c;
         border: 4px solid #f6e8e8;
         color: #f6e8e8;
       }
@@ -277,7 +280,7 @@
       <ul class="toolbar">
         <li>
           <h1 class="title">
-            <img src="helmet.png" height="16" alt="" />
+            <img id="title_icon" src="helmet.png" height="16" alt="" />
             &nbsp;
             Murder Death Click
           </h1>
@@ -358,6 +361,7 @@
           <p id="game_menu_description" class="label-small label-center">Murder Orcs. Get Loot. Level Up.</p>
         </div>
         <button id="game_menu_button" class="action_button" type="button">New Game</button>
+        <button id="game_menu_button_continue" class="action_button action_button-hollow action_button-hidden" type="button">Continue</button>
       </div>
     </section>
 
@@ -700,6 +704,7 @@
         ////////
       */
       // main ui
+      const titleIconEl = document.getElementById('title_icon');
       const inventoryButtonEl = document.getElementById('inventory_button');
       const xpEl = document.getElementById('xp');
       const xpStatusEl = document.getElementById('xp_status');
@@ -730,6 +735,7 @@
       const gameMenuTitleEl = document.getElementById('game_menu_title');
       const gameMenuDescriptionEl = document.getElementById('game_menu_description');
       const gameMenuButtonEl = document.getElementById('game_menu_button');
+      const gameMenuContinueButtonEl = document.getElementById('game_menu_button_continue');
 
       // data binding
       const UI = {
@@ -1000,6 +1006,16 @@
             elements.forEach((newElement) => { el.appendChild(newElement); });
           },
         },
+        continueButton: {
+          element: gameMenuContinueButtonEl,
+          value: (el, state) => {
+            if (state.wounds < state.hp) {
+              el.classList.remove('action_button-hidden');
+            } else {
+              el.classList.add('action_button-hidden');
+            }
+          },
+        },
       };
       const updateUi = (currentState) => {
         Object.values(UI).forEach(item => {
@@ -1008,10 +1024,19 @@
       };
 
       // actions
+      titleIconEl.addEventListener('click', () => {
+        gameMenuModalEl.classList.add('modal-visible');
+      });
       gameMenuButtonEl.addEventListener('click', () => {
         localStorage.removeItem('rpg-state');
         load();
         attackButtonEl.disabled = false;
+        gameMenuModalEl.classList.remove('modal-visible');
+        gameMenuTitleEl.innerText = 'Murder Death Click';
+        const killCount = new Intl.NumberFormat(navigator.language).format(gameState.getState().killCount);
+        gameMenuDescriptionEl.innerText = 'Murder Orcs. Get Loot. Level Up.';
+      });
+      gameMenuContinueButtonEl.addEventListener('click', () => {
         gameMenuModalEl.classList.remove('modal-visible');
       });
       if (typeof window.ontouchstart === 'undefined') {
@@ -1050,12 +1075,6 @@
 
 
       /* INIT GAME */
-      function continueIf() {
-        if (localStorage.getItem(SAVE_KEY)) {
-          gameMenuModalEl.classList.remove('modal-visible');
-        }
-      }
-      continueIf();
       load();
     </script>
   </body>

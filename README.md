@@ -37,6 +37,7 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [x] Rename "HP" stat type to "Armor"
 - [x] disable attack button when dead
 - [x] Make leveling increase base HP; heal player when leveling up
+- [x] Open the game menu from mid-game; add continue button if game is in progress
 
 ### v2
 - [ ] Sell inventory items for GP
