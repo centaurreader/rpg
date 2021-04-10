@@ -158,6 +158,9 @@
         margin: 1rem auto;
         display: block;
       }
+      .action_button:disabled {
+        opacity: .25;
+      }
       .action_button-hollow {
         background-color: transparent;
         border: 4px solid #f6e8e8;
@@ -257,7 +260,11 @@
       }
 
       .game_menu_background {
-        background-image: url('brick-pattern.gif');
+        background-image: url(brick-pattern.gif);
+        padding: 4rem 2rem;
+        height: 500px;
+        margin: 0 auto;
+        margin-top: 10vh;
       }
       .game_menu_logo {
         align-self: center;
@@ -367,7 +374,7 @@
           gp: 0,
           hp: 100,
           wounds: 0,
-          damage: 10,                    
+          damage: 6,
           level: 1,
           inventory: [],
           enemy: null,
@@ -497,22 +504,28 @@
         return Math.abs(diff >= 2 ? level + Math.ceil(diff / 2) : level - diff);
       };
       const getXpForLevel = (level) => {
-        const translation = 100;
+        const translation = 50;
         const percentageIncrease = .1;
         return Math.ceil(translation * (1 + percentageIncrease)**level);
       };
       const calcXp = (xpToAdd) => {
-        const currentXp = gameState.getState().xp;
-        const newXp = currentXp + 10;
+        const { xp: currentXp, enemy } = gameState.getState();
+        const enemyXp = enemy.level * 10
+        const newXp = currentXp + enemyXp;
         gameState.setState({
           xp: newXp,
         });
       };
       const calcLevel = () => {
-        const { xp, level, } = gameState.getState();
+        const { xp, level, hp, wounds } = gameState.getState();
+        const shouldLevelUp = xp >= getXpForLevel(level);
+        const hpIfLevelUp = hp + ((level + 1) * 10);
+        const woundsIfLevelUp = wounds - (hpIfLevelUp - hp) < 0 ? 0 : wounds - (hpIfLevelUp - hp);
         gameState.setState({
-          level: xp >= getXpForLevel(level) ? level + 1 : level,
-          xp: xp >= getXpForLevel(level) ? 0 : xp,
+          level: shouldLevelUp ? level + 1 : level,
+          xp: shouldLevelUp ? 0 : xp,
+          hp: shouldLevelUp ? hpIfLevelUp : hp,
+          wounds: shouldLevelUp ? woundsIfLevelUp : wounds,
         });
       };
       const shouldLoot = () => {
@@ -558,12 +571,13 @@
         const level = getEnemyLevelForPlayerLevel(state.level);
         const type = enemyTable[0][Math.floor(Math.random() * enemyTable[0].length)];
         const enemy = enemyTable[1][Math.floor(Math.random() * enemyTable[1].length)];
+        const enemyHp = type.modifier * (enemy.modifier + level);
         gameState.setState({
           enemy: {
             name: `${type.name} ${enemy.name}`,
             level: level === 0 ? 1 : level,
-            hp: type.modifier * enemy.modifier,
-            maxHp: type.modifier * enemy.modifier,
+            hp: enemyHp,
+            maxHp: enemyHp,
             damage: type.modifier + (enemy.damage || 10),
           },
         });
@@ -575,7 +589,7 @@
         return Math.floor(Math.random() * 100) > 25 ? calculatedDamage : 0;
       };
       const rollEnemyDamage = (enemy) => {
-        const calculatedDamage = enemy.damage;
+        const calculatedDamage = enemy.damage + enemy.level;
         return Math.floor(Math.random() * 100) > 50 ? calculatedDamage : 0;
       };
       const calcWounds = (damage) => {
@@ -597,6 +611,9 @@
         });
       };
       function onAttack() {
+        if (attackButtonEl.disabled) {
+          return;
+        }
         attack.setAttribute('style', 'visibility: visible');
       }
       function equipItem(slotName, toEquip) {
@@ -631,6 +648,9 @@
         });
       }
       function tick() {
+        if (attackButtonEl.disabled) {
+          return;
+        }
         attack.setAttribute('style', 'visibility: hidden');
 
         const damageDone = rollDamage();
@@ -662,14 +682,13 @@
         }
 
         if (gameState.getState().wounds >= gameState.getState().hp) {
-          attackButtonEl.setAttribute('disabled', 'true');
+          attackButtonEl.disabled = true;
           setTimeout(() => {
             gameMenuTitleEl.innerText = 'You died';
             const killCount = new Intl.NumberFormat(navigator.language).format(gameState.getState().killCount);
             gameMenuDescriptionEl.innerText = `after murdering ${killCount} orcs.`;
             localStorage.removeItem('rpg-state');
             gameMenuModalEl.classList.add('modal-visible');
-            save();
           }, 1000);
         }
       }
@@ -991,6 +1010,7 @@
       gameMenuButtonEl.addEventListener('click', () => {
         localStorage.removeItem('rpg-state');
         load();
+        attackButtonEl.disabled = false;
         gameMenuModalEl.classList.remove('modal-visible');
       });
       if (typeof window.ontouchstart === 'undefined') {
