@@ -576,7 +576,7 @@
         const level = getEnemyLevelForPlayerLevel(state.level);
         const type = enemyTable[0][Math.floor(Math.random() * enemyTable[0].length)];
         const enemy = enemyTable[1][Math.floor(Math.random() * enemyTable[1].length)];
-        const enemyHp = type.modifier * (enemy.modifier + level);
+        const enemyHp = (type.modifier + level) * (enemy.modifier + level);
         gameState.setState({
           enemy: {
             name: `${type.name} ${enemy.name}`,
