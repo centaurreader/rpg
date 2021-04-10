@@ -509,8 +509,9 @@
         return Math.ceil(translation * (1 + percentageIncrease)**level);
       };
       const calcXp = (xpToAdd) => {
+        const xpCurve = { ten: 1, twenty: 2, }
         const { xp: currentXp, enemy } = gameState.getState();
-        const enemyXp = enemy.level * 10
+        const enemyXp = Math.ceil(enemy.level * 2.5);
         const newXp = currentXp + enemyXp;
         gameState.setState({
           xp: newXp,
@@ -590,7 +591,7 @@
       };
       const rollEnemyDamage = (enemy) => {
         const calculatedDamage = enemy.damage + enemy.level;
-        return Math.floor(Math.random() * 100) > 50 ? calculatedDamage : 0;
+        return Math.floor(Math.random() * 100) > 75 ? calculatedDamage : 0;
       };
       const calcWounds = (damage) => {
         const { hp, inventory } = gameState.getState();
