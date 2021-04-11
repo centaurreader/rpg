@@ -352,6 +352,16 @@
       </div>
     </section>
 
+    <section id="inventory_slot" class="modal">
+      <div class="modal_inner">
+        <h1 class="visually_hidden">Equipment Slot</h1>
+        <div class="container">
+          <div id="inventory_slot_detail"></div>
+        </div>
+        <button id="inventory_slot_close_button" class="action_button" type="button">Back</button>
+      </div>
+    </section>
+
     <section id="inventory_detail" class="modal">
       <div class="modal_inner">
         <h1 class="visually_hidden">Item Detail</h1>
@@ -393,6 +403,7 @@
           inventory: [],
           enemy: null,
           inventoryItem: null,
+          inventorySlot: null,
           killCount: 0,
         };
         this.getState = () => state;
@@ -732,10 +743,13 @@
       const lootDropEl = document.getElementById('loot');
       // inventory
       const inventoryModalEl = document.getElementById('inventory');
+      const gpEl = document.getElementById('gp');
       const inventoryCloseEl = document.getElementById('inventory_close_button');
+      const inventorySlotModalEl = document.getElementById('inventory_slot');
+      const inventorySlotDetailEl = document.getElementById('inventory_slot_detail');
+      const inventorySlotCloseEl = document.getElementById('inventory_slot_close_button');
       const inventoryDetailModalEl = document.getElementById('inventory_detail');
       const inventoryDetailCloseEl = document.getElementById('inventory_detail_close_button');
-      const gpEl = document.getElementById('gp');
       const equippedItemsEl = document.getElementById('equipped_items');
       const unequippedInventoryEl = document.getElementById('unequipped_items');
       const inventoryDetailItemEl = document.getElementById('inventory_detail_item');
@@ -856,7 +870,7 @@
               el.appendChild(slotNameEl);
 
               const itemSlotEl = document.createElement('a');
-              itemSlotEl.addEventListener('click', () => toModalSubMenu(equippedItem));
+              itemSlotEl.addEventListener('click', () => toSlotSubMenu(slot.key));
               itemSlotEl.setAttribute('href', '#');
               itemSlotEl.classList.add('inventory_item');
               
@@ -904,6 +918,39 @@
             });
           },
         },
+        inventorySlot: {
+          element: inventorySlotDetailEl,
+          value: (el, state) => {
+            if (!state.inventorySlot) {
+              return;
+            }
+            el.innerHTML = null;
+
+            const currentlyEquippedItemsEls = buildEquippedItems(state.inventory, state.inventorySlot);
+
+            const inventoryItemTypeEl = document.createElement('p');
+            inventoryItemTypeEl.classList.add('label-small', 'inventory_category');
+            inventoryItemTypeEl.innerText = 'Unequipped Items';
+            const itemsForSlot = state.inventory
+              .filter((item) => !item.equipped)
+              .filter((item) => state.inventorySlot.includes(item.type.type));
+            const itemsForSlotEls = itemsForSlot.map((item) => buildInventoryDetailItem(
+              null,
+              item.name,
+              `${item.power} ${item.statType}`,
+              () => toModalSubMenu(item)
+            ));
+
+            currentlyEquippedItemsEls.forEach((els) => {
+              el.appendChild(els.labelEl);
+              el.appendChild(els.itemEl);
+            });
+            el.appendChild(inventoryItemTypeEl);
+            itemsForSlotEls.forEach((els) => {
+              el.appendChild(els.itemEl);
+            });
+          },
+        },
         inventoryDetailItem: {
           element: inventoryDetailItemEl,
           value: (el, state) => {
@@ -913,24 +960,7 @@
               return;
             }
 
-            const eSlots = equipmentSlots.filter((slot) => slot.key.includes(state.inventoryItem.type.type));
-            const currentlyEquippedItems = state.inventory.filter((item) => eSlots.some(slot => slot.key === item.equipped));
-            const currentlyEquippedItemsEls = eSlots.map((slot) => {
-              let currentlyEquippedItemEls = buildInventoryDetailItem(
-                `Equipped: ${slot.value}`,
-                'Nothing',
-                'N/A'
-              );
-              const currentlyEquippedItem = state.inventory.find((item) => slot.key === item.equipped);
-              if (currentlyEquippedItem) {
-                currentlyEquippedItemEls = buildInventoryDetailItem(
-                  `Equipped: ${slot.value}`,
-                  currentlyEquippedItem.name,
-                  `${currentlyEquippedItem.power} ${currentlyEquippedItem.statType}`
-                );
-              }
-              return currentlyEquippedItemEls;
-            });
+            const currentlyEquippedItemsEls = buildEquippedItems(state.inventory, state.inventoryItem.type.type);
             const selectedItemEls = buildInventoryDetailItem(
               'This Item',
               state.inventoryItem.name,
@@ -1038,25 +1068,50 @@
           },
         },
       };
-      const buildInventoryDetailItem = (label, name, description) => {
+      const buildEquippedItems = (inventory, itemType) => {
+        const eSlots = equipmentSlots.filter((slot) => slot.key.includes(itemType));
+        const currentlyEquippedItems = inventory.filter((item) => eSlots.some(slot => slot.key === item.equipped));
+        const currentlyEquippedItemsEls = eSlots.map((slot) => {
+          let currentlyEquippedItemEls = buildInventoryDetailItem(
+            `Equipped: ${slot.value}`,
+            'Nothing',
+            'N/A'
+          );
+          const currentlyEquippedItem = inventory.find((item) => slot.key === item.equipped);
+          if (currentlyEquippedItem) {
+            currentlyEquippedItemEls = buildInventoryDetailItem(
+              `Equipped: ${slot.value}`,
+              currentlyEquippedItem.name,
+              `${currentlyEquippedItem.power} ${currentlyEquippedItem.statType}`,
+              () => toModalSubMenu(currentlyEquippedItem)
+            );
+          }
+          return currentlyEquippedItemEls;
+        });
+        return currentlyEquippedItemsEls;
+      };
+      const buildInventoryDetailItem = (label, name, description, onClick) => {
         const inventoryItemTypeEl = document.createElement('p');
-            inventoryItemTypeEl.classList.add('label-small', 'inventory_category');
-            inventoryItemTypeEl.innerText = label;
+        inventoryItemTypeEl.classList.add('label-small', 'inventory_category');
+        inventoryItemTypeEl.innerText = label;
 
-            const inventoryItemInfoContainerEl = document.createElement('div');
-            inventoryItemInfoContainerEl.classList.add('inventory_item');
+        const inventoryItemInfoContainerEl = document.createElement('div');
+        if (onClick) {
+          inventoryItemInfoContainerEl.addEventListener('click', onClick);
+        }
+        inventoryItemInfoContainerEl.classList.add('inventory_item');
 
-            const inventoryItemInfoNameEl = document.createElement('p');
-            inventoryItemInfoNameEl.classList.add('label-large');
-            inventoryItemInfoNameEl.innerText = name;
-            inventoryItemInfoContainerEl.appendChild(inventoryItemInfoNameEl);
+        const inventoryItemInfoNameEl = document.createElement('p');
+        inventoryItemInfoNameEl.classList.add('label-large');
+        inventoryItemInfoNameEl.innerText = name;
+        inventoryItemInfoContainerEl.appendChild(inventoryItemInfoNameEl);
 
-            const inventoryItemInfoStatEl = document.createElement('p');
-            inventoryItemInfoStatEl.classList.add('label-medium');
-            inventoryItemInfoStatEl.innerText = description;
-            inventoryItemInfoContainerEl.appendChild(inventoryItemInfoStatEl);
+        const inventoryItemInfoStatEl = document.createElement('p');
+        inventoryItemInfoStatEl.classList.add('label-medium');
+        inventoryItemInfoStatEl.innerText = description;
+        inventoryItemInfoContainerEl.appendChild(inventoryItemInfoStatEl);
 
-            return { labelEl: inventoryItemTypeEl, itemEl: inventoryItemInfoContainerEl, };
+        return { labelEl: inventoryItemTypeEl, itemEl: inventoryItemInfoContainerEl, };
       };
       const updateUi = (currentState) => {
         Object.values(UI).forEach(item => {
@@ -1092,6 +1147,16 @@
       inventoryCloseEl.addEventListener('click', () => {
         inventoryModalEl.classList.remove('modal-visible');
       });
+      function toSlotSubMenu(slot) {
+        gameState.setState({ inventorySlot: slot });
+        updateUi(gameState.getState());
+        inventorySlotModalEl.classList.add('modal-visible');
+      }
+      function fromSlotSubMenu(slot) {
+        inventorySlotModalEl.classList.remove('modal-visible');
+        gameState.setState({ inventorySlot: null });
+      }
+      inventorySlotCloseEl.addEventListener('click', fromSlotSubMenu);
       function toModalSubMenu(item) {
         gameState.setState({ inventoryItem: item });
         updateUi(gameState.getState());
