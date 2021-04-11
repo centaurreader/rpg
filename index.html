@@ -913,25 +913,30 @@
               return;
             }
 
-            const inventoryItemTypeEl = document.createElement('p');
-            inventoryItemTypeEl.classList.add('label-small', 'inventory_category');
-            inventoryItemTypeEl.innerText = state.inventoryItem.type.type;
-            el.appendChild(inventoryItemTypeEl);
+            const eSlot = equipmentSlots.find((slot) => slot.key === state.inventoryItem.type.type);
+            const currentlyEquippedItem = state.inventory.find((item) => item.equipped === eSlot.key);
+            let currentlyEquippedItemEls = buildInventoryDetailItem(
+                `Equipped: ${eSlot.value}`,
+                'Nothing',
+                'N/A'
+              );
+            if (currentlyEquippedItem) {
+              currentlyEquippedItemEls = buildInventoryDetailItem(
+                `Equipped: ${eSlot.value}`,
+                currentlyEquippedItem.name,
+                `${currentlyEquippedItem.power} ${currentlyEquippedItem.statType}`
+              );
+            }
+            const selectedItemEls = buildInventoryDetailItem(
+              'This Item',
+              state.inventoryItem.name,
+              `${state.inventoryItem.power} ${state.inventoryItem.statType}`
+            );
 
-            const inventoryItemInfoContainerEl = document.createElement('div');
-            inventoryItemInfoContainerEl.classList.add('inventory_item', 'inventory_item-border');
-
-            const inventoryItemInfoNameEl = document.createElement('p');
-            inventoryItemInfoNameEl.classList.add('label-large');
-            inventoryItemInfoNameEl.innerText = state.inventoryItem.name;
-            inventoryItemInfoContainerEl.appendChild(inventoryItemInfoNameEl);
-
-            const inventoryItemInfoStatEl = document.createElement('p');
-            inventoryItemInfoStatEl.classList.add('label-medium');
-            inventoryItemInfoStatEl.innerText = `${state.inventoryItem.power} ${state.inventoryItem.statType}`;
-            inventoryItemInfoContainerEl.appendChild(inventoryItemInfoStatEl);
-
-            el.appendChild(inventoryItemInfoContainerEl);
+            el.appendChild(currentlyEquippedItemEls.labelEl);
+            el.appendChild(currentlyEquippedItemEls.itemEl);
+            el.appendChild(selectedItemEls.labelEl);
+            el.appendChild(selectedItemEls.itemEl);
           },
         },
         inventoryDetailActions: {
@@ -1026,6 +1031,26 @@
             }
           },
         },
+      };
+      const buildInventoryDetailItem = (label, name, description) => {
+        const inventoryItemTypeEl = document.createElement('p');
+            inventoryItemTypeEl.classList.add('label-small', 'inventory_category');
+            inventoryItemTypeEl.innerText = label;
+
+            const inventoryItemInfoContainerEl = document.createElement('div');
+            inventoryItemInfoContainerEl.classList.add('inventory_item');
+
+            const inventoryItemInfoNameEl = document.createElement('p');
+            inventoryItemInfoNameEl.classList.add('label-large');
+            inventoryItemInfoNameEl.innerText = name;
+            inventoryItemInfoContainerEl.appendChild(inventoryItemInfoNameEl);
+
+            const inventoryItemInfoStatEl = document.createElement('p');
+            inventoryItemInfoStatEl.classList.add('label-medium');
+            inventoryItemInfoStatEl.innerText = description;
+            inventoryItemInfoContainerEl.appendChild(inventoryItemInfoStatEl);
+
+            return { labelEl: inventoryItemTypeEl, itemEl: inventoryItemInfoContainerEl, };
       };
       const updateUi = (currentState) => {
         Object.values(UI).forEach(item => {

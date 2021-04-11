@@ -38,6 +38,7 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [x] disable attack button when dead
 - [x] Make leveling increase base HP; heal player when leveling up
 - [x] Open the game menu from mid-game; add continue button if game is in progress
+- [ ] Equip items from slot menu (click "Head" -> see Head items -> equip one)
 
 ### v2
 - [ ] Scale inventory items with progression
@@ -46,4 +47,4 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [ ] Show damage when you click
 - [ ] Show death animation for monsters
 - [ ] More enemy types
-- [ ] Equip items from slot menu (click "Head" -> see Head items -> equip one)
+- [ ] PWA compliance
