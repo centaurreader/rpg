@@ -913,28 +913,34 @@
               return;
             }
 
-            const eSlot = equipmentSlots.find((slot) => slot.key.includes(state.inventoryItem.type.type));
-            const currentlyEquippedItem = state.inventory.find((item) => item.equipped === eSlot.key);
-            let currentlyEquippedItemEls = buildInventoryDetailItem(
-                `Equipped: ${eSlot.value}`,
+            const eSlots = equipmentSlots.filter((slot) => slot.key.includes(state.inventoryItem.type.type));
+            const currentlyEquippedItems = state.inventory.filter((item) => eSlots.some(slot => slot.key === item.equipped));
+            const currentlyEquippedItemsEls = eSlots.map((slot) => {
+              let currentlyEquippedItemEls = buildInventoryDetailItem(
+                `Equipped: ${slot.value}`,
                 'Nothing',
                 'N/A'
               );
-            if (currentlyEquippedItem) {
-              currentlyEquippedItemEls = buildInventoryDetailItem(
-                `Equipped: ${eSlot.value}`,
-                currentlyEquippedItem.name,
-                `${currentlyEquippedItem.power} ${currentlyEquippedItem.statType}`
-              );
-            }
+              const currentlyEquippedItem = state.inventory.find((item) => slot.key === item.equipped);
+              if (currentlyEquippedItem) {
+                currentlyEquippedItemEls = buildInventoryDetailItem(
+                  `Equipped: ${slot.value}`,
+                  currentlyEquippedItem.name,
+                  `${currentlyEquippedItem.power} ${currentlyEquippedItem.statType}`
+                );
+              }
+              return currentlyEquippedItemEls;
+            });
             const selectedItemEls = buildInventoryDetailItem(
               'This Item',
               state.inventoryItem.name,
               `${state.inventoryItem.power} ${state.inventoryItem.statType}`
             );
 
-            el.appendChild(currentlyEquippedItemEls.labelEl);
-            el.appendChild(currentlyEquippedItemEls.itemEl);
+            currentlyEquippedItemsEls.forEach((els) => {
+              el.appendChild(els.labelEl);
+              el.appendChild(els.itemEl);
+            });
             el.appendChild(selectedItemEls.labelEl);
             el.appendChild(selectedItemEls.itemEl);
           },
