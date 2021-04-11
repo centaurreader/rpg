@@ -913,7 +913,7 @@
               return;
             }
 
-            const eSlot = equipmentSlots.find((slot) => slot.key === state.inventoryItem.type.type);
+            const eSlot = equipmentSlots.find((slot) => slot.key.includes(state.inventoryItem.type.type));
             const currentlyEquippedItem = state.inventory.find((item) => item.equipped === eSlot.key);
             let currentlyEquippedItemEls = buildInventoryDetailItem(
                 `Equipped: ${eSlot.value}`,
