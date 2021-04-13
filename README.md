@@ -41,10 +41,14 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [x] Equip items from slot menu (click "Head" -> see Head items -> equip one)
 
 ### v1.1
-- [ ] Scale inventory items with progression
-- [ ] Add new damage calculations
+- [x] Scale inventory items with progression
+  - [x] add level to loot and factor into power
+  - [x] roll high level loot less often
+  - [x] display loot level in inventory
+- [x] Add new calculations for damage
 - [ ] Make miss chance an accuracy stat on damage items
 - [ ] Make enemy miss chance a dodge stat on armor items
+- [ ] Make enemies have chance to pierce armor
 
 ### Later
 - [ ] Sell inventory items for GP

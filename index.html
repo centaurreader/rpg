@@ -563,24 +563,30 @@
         const skewed = rng / .6;
         return skewed > limit;
       };
+      const rollLootLevel = () => {
+        const state = gameState.getState();
+        return Math.ceil(Math.pow(Math.random(), 3) * (state.level + 2));
+      };
       const lootProc = () => {
         if (!shouldLoot()) {
           return;
         }
+        const state = gameState.getState();
         const cat1 = Math.floor(Math.random() * lootTable[0].length);
         const cat2 = Math.floor(Math.random() * lootTable[1].length);
         const type = lootTable[1][cat2].type;
-        const state = gameState.getState();
+        const lootLevel = rollLootLevel();
         gameState.setState({
           inventory: [
             ...state.inventory,
             {
-              name: `${lootTable[0][cat1].name} ${lootTable[1][cat2].name}`,
+              name: `Lvl ${lootLevel} ${lootTable[0][cat1].name} ${lootTable[1][cat2].name}`,
               quality: lootTable[0][cat1],
               type: lootTable[1][cat2],
-              power: (lootTable[0][cat1].modifier * lootTable[1][cat2].modifier) + 10,
+              power: (lootTable[0][cat1].modifier * lootTable[1][cat2].modifier) * lootLevel,
               statType: lootTable[1][cat2].statType,
               equipped: null,
+              level: lootLevel,
             },
           ],
         });
@@ -607,19 +613,18 @@
             level: level === 0 ? 1 : level,
             hp: enemyHp,
             maxHp: enemyHp,
-            damage: type.modifier + (enemy.damage || 10),
+            damage: type.modifier * enemy.modifier * level,
           },
         });
       };
       const rollDamage = () => {
-        const { damage, inventory, } = gameState.getState();
+        const { damage, inventory, level } = gameState.getState();
         const arms = inventory.filter((item) => (item.equipped || '').includes('HAND') && item.statType === 'Damage');
-        const calculatedDamage = damage + arms.reduce((total, item) => item.power + total, 0);
+        const calculatedDamage = (damage * level) + arms.reduce((total, item) => item.power + total, 0);
         return Math.floor(Math.random() * 100) > 25 ? calculatedDamage : 0;
       };
       const rollEnemyDamage = (enemy) => {
-        const calculatedDamage = enemy.damage + enemy.level;
-        return Math.floor(Math.random() * 100) > 75 ? calculatedDamage : 0;
+        return Math.floor(Math.random() * 100) > 75 ? enemy.damage : 0;
       };
       const calcWounds = (damage) => {
         const { hp, inventory } = gameState.getState();
