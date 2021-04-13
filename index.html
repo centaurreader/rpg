@@ -1147,8 +1147,8 @@
         attackButtonEl.addEventListener('mousedown', onAttack);
         attackButtonEl.addEventListener('mouseup', tick);
       }
-      attackButtonEl.addEventListener('touchstart', onAttack);
-      attackButtonEl.addEventListener('touchend', tick);
+      attackButtonEl.addEventListener('touchstart', onAttack, { passive: true });
+      attackButtonEl.addEventListener('touchend', tick, { passive: true });
       inventoryButtonEl.addEventListener('click', () => {
         inventoryModalEl.classList.add('modal-visible');
       });
