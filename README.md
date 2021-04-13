@@ -40,8 +40,13 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [x] Open the game menu from mid-game; add continue button if game is in progress
 - [x] Equip items from slot menu (click "Head" -> see Head items -> equip one)
 
-### v2
+### v1.1
 - [ ] Scale inventory items with progression
+- [ ] Add new damage calculations
+- [ ] Make miss chance an accuracy stat on damage items
+- [ ] Make enemy miss chance a dodge stat on armor items
+
+### Later
 - [ ] Sell inventory items for GP
 - [ ] Buy items with GP
 - [ ] Show damage when you click
