@@ -46,13 +46,20 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
   - [x] roll high level loot less often
   - [x] display loot level in inventory
 - [x] Add new calculations for damage
-- [ ] Make miss chance an accuracy stat on damage items
-- [ ] Make enemy miss chance a dodge stat on armor items
-- [ ] Make enemies have chance to pierce armor
+- [x] item stats
+  - [x] Make miss chance an accuracy stat on damage items
+  - [x] Make enemy miss chance a dodge stat on armor items
+  - [x] show stats in inventory screens
 
 ### Later
-- [ ] Sell inventory items for GP
-- [ ] Buy items with GP
+- [ ] Store
+  - [ ] Sell inventory items for GP
+  - [ ] Buy items with GP
+  - [ ] Randomly encounter store
+- [ ] Make enemies qualities have effects
+  - [ ] Piercing
+  - [ ] Leech/Vampire
+  - [ ] Armored
 - [ ] Show damage when you click
 - [ ] Show death animation for monsters
 - [ ] More enemy types

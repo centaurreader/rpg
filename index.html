@@ -468,15 +468,15 @@
               { name: 'Worthless', modifier: 1, statType: 'Armor' },
           ],
           [
-            { name: 'Boots', type: 'FEET', modifier: 5, statType: 'Armor' },
-            { name: 'Clogs', type: 'FEET', modifier: 3, statType: 'Armor' },
-            { name: 'Sandals', type: 'FEET', modifier: 2, statType: 'Armor' },
-            { name: 'Shoes', type: 'FEET', modifier: 4, statType: 'Armor' },
+            { name: 'Boots', type: 'FEET', modifier: 5, stats: [ { name: 'Dodge', value: 10 } ], statType: 'Armor' },
+            { name: 'Clogs', type: 'FEET', modifier: 3, stats: [ { name: 'Dodge', value: 20 } ], statType: 'Armor' },
+            { name: 'Sandals', type: 'FEET', modifier: 2, stats: [ { name: 'Dodge', value: 30 } ], statType: 'Armor' },
+            { name: 'Shoes', type: 'FEET', modifier: 4, stats: [ { name: 'Dodge', value: 15 } ], statType: 'Armor' },
 
-            { name: 'Pants', type: 'LEGS', modifier: 3, statType: 'Armor' },
-            { name: 'Loin Cloth', type: 'LEGS', modifier: 1, statType: 'Armor' },
-            { name: 'Skirt', type: 'LEGS', modifier: 2, statType: 'Armor' },
-            { name: 'Leggings', type: 'LEGS', modifier: 2, statType: 'Armor' },
+            { name: 'Pants', type: 'LEGS', modifier: 3, stats: [ { name: 'Dodge', value: 10 } ], statType: 'Armor' },
+            { name: 'Loin Cloth', type: 'LEGS', modifier: 1, stats: [ { name: 'Dodge', value: 20 } ], statType: 'Armor' },
+            { name: 'Skirt', type: 'LEGS', modifier: 2, stats: [ { name: 'Dodge', value: 15 } ], statType: 'Armor' },
+            { name: 'Leggings', type: 'LEGS', modifier: 2, stats: [ { name: 'Dodge', value: 15 } ], statType: 'Armor' },
 
             { name: 'Cap', type: 'HEAD', modifier: 2, statType: 'Armor' },
             { name: 'Hat', type: 'HEAD', modifier: 3, statType: 'Armor' },
@@ -484,22 +484,23 @@
             { name: 'Ribbon', type: 'HEAD', modifier: 1, statType: 'Armor' },
 
             { name: 'Chainmail', type: 'BODY', modifier: 6, statType: 'Armor' },
-            { name: 'Cuirass', type: 'BODY', modifier: 5, statType: 'Armor' },
-            { name: 'Doublet', type: 'BODY', modifier: 3, statType: 'Armor' },
-            { name: 'Shirt', type: 'BODY', modifier: 2, statType: 'Armor' },
+            { name: 'Cuirass', type: 'BODY', modifier: 5, stats: [ { name: 'Dodge', value: 5 } ], statType: 'Armor' },
+            { name: 'Doublet', type: 'BODY', modifier: 3, stats: [ { name: 'Dodge', value: 10 } ], statType: 'Armor' },
+            { name: 'Shirt', type: 'BODY', modifier: 2, stats: [ { name: 'Dodge', value: 20 } ], statType: 'Armor' },
 
-            { name: 'Axe', type: 'HAND', modifier: 10, statType: 'Damage' },
-            { name: 'Bow', type: 'HAND', modifier: 3, statType: 'Damage' },
             { name: 'Buckler', type: 'HAND', modifier: 2, statType: 'Armor' },
-            { name: 'Flail', type: 'HAND', modifier: 6, statType: 'Damage' },
-            { name: 'Hammer', type: 'HAND', modifier: 5, statType: 'Damage' },
             { name: 'Heater', type: 'HAND', modifier: 5, statType: 'Armor', },
-            { name: 'Lance', type: 'HAND', modifier: 4, statType: 'Damage' },
-            { name: 'Mace', type: 'HAND', modifier: 5, statType: 'Damage' },
-            { name: 'Scepter', type: 'HAND', modifier: 3, statType: 'Damage' },
-            { name: 'Staff', type: 'HAND', modifier: 2, statType: 'Damage' },
-            { name: 'Sword', type: 'HAND', modifier: 7, statType: 'Damage' },
             { name: 'Tower Shield', type: 'HAND', modifier: 10, statType: 'Armor' },
+
+            { name: 'Axe', type: 'HAND', modifier: 10, stats: [ { name: 'Accuracy', value: 50 } ], statType: 'Damage' },
+            { name: 'Bow', type: 'HAND', modifier: 3, stats: [ { name: 'Accuracy', value: 90 } ], statType: 'Damage' },
+            { name: 'Flail', type: 'HAND', modifier: 6, stats: [ { name: 'Accuracy', value: 60 } ], statType: 'Damage' },
+            { name: 'Hammer', type: 'HAND', modifier: 5, stats: [ { name: 'Accuracy', value: 70 } ], statType: 'Damage' },
+            { name: 'Lance', type: 'HAND', modifier: 4, stats: [ { name: 'Accuracy', value: 80 } ], statType: 'Damage' },
+            { name: 'Mace', type: 'HAND', modifier: 5, stats: [ { name: 'Accuracy', value: 70 } ], statType: 'Damage' },
+            { name: 'Scepter', type: 'HAND', modifier: 3, stats: [ { name: 'Accuracy', value: 90 } ], statType: 'Damage' },
+            { name: 'Staff', type: 'HAND', modifier: 2, stats: [ { name: 'Accuracy', value: 90 } ], statType: 'Damage' },
+            { name: 'Sword', type: 'HAND', modifier: 7, stats: [ { name: 'Accuracy', value: 75 } ], statType: 'Damage' },
           ],
       ];
       const enemyTable = [
@@ -617,14 +618,43 @@
           },
         });
       };
+      const shouldHit = () => {
+        const { inventory } = gameState.getState();
+        const equippedWeapons = inventory.filter((item) => item.equipped && item.equipped.includes('HAND') && item.statType === 'Damage');
+        const isUnarmed = equippedWeapons.length === 0;
+        const isDualWielding = equippedWeapons.length === 2;
+        let accuracyRating = equippedWeapons.reduce((sum, curr) => {
+          const { value } = curr.type.stats ? curr.type.stats.find((stat) => stat.name === 'Accuracy') : { value: 75 };
+          return sum + value;
+        }, 0);
+        if (isUnarmed) {
+          return true;
+        }
+        if (isDualWielding) {
+          accuracyRating = (accuracyRating * .8) / 2;
+        }
+        return Math.floor(Math.random() * 100) > (100 - accuracyRating);
+      };
       const rollDamage = () => {
         const { damage, inventory, level } = gameState.getState();
         const arms = inventory.filter((item) => (item.equipped || '').includes('HAND') && item.statType === 'Damage');
         const calculatedDamage = (damage * level) + arms.reduce((total, item) => item.power + total, 0);
-        return Math.floor(Math.random() * 100) > 25 ? calculatedDamage : 0;
+        return shouldHit() ? calculatedDamage : 0;
+      };
+      const shouldDodge = () => {
+        const { inventory } = gameState.getState();
+        const equippedArmor = inventory.filter((item) => item.equipped && item.statType === 'Armor');
+        const dodgeRating = equippedArmor.reduce((sum, curr) => {
+          const { value } = curr.type.stats ? curr.type.stats.find((stat) => stat.name === 'Dodge') : { value: 0 };
+          return sum + value;
+        }, 0);
+        return (Math.random() * 100) < dodgeRating;
+      };
+      const shouldMiss = () => {
+        return Math.random() * 100 > 20;
       };
       const rollEnemyDamage = (enemy) => {
-        return Math.floor(Math.random() * 100) > 75 ? enemy.damage : 0;
+        return !shouldMiss() && !shouldDodge() ? enemy.damage : 0;
       };
       const calcWounds = (damage) => {
         const { hp, inventory } = gameState.getState();
@@ -981,6 +1011,13 @@
             });
             el.appendChild(selectedItemEls.labelEl);
             el.appendChild(selectedItemEls.itemEl);
+
+            const statEls = (state.inventoryItem.type.stats || []).map((stat) => {
+              const statEl = document.createElement('p');
+              statEl.innerText = `${stat.name}: ${stat.value}`;
+              return statEl;
+            });
+            statEls.forEach((statEl) => { el.appendChild(statEl); });
           },
         },
         inventoryDetailActions: {
