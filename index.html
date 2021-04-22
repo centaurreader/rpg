@@ -210,6 +210,14 @@
       .modal_inner-no_fill {
         display: inherit;
       }
+      #current_location {
+        text-align: right;
+        margin-top: 1rem;
+      }
+      #area_menu_image {
+        margin: 1rem auto 2rem;
+        display: block;
+      }
       #gp {
         text-align: right;
         margin-top: 1rem;
@@ -361,6 +369,7 @@
     <section id="character_menu" class="modal">
       <div class="modal_inner">
         <h1 class="visually_hidden">Character</h1>
+        <p id="current_location" class="label-small">Current Location: Open Field</p>
         <div class="container container-center">
           <img src="character.gif" alt="" width="128" />
           <ul class="stat_list" id="character_stats"></ul>
@@ -413,6 +422,24 @@
         </div>
         <button id="game_menu_button" class="action_button" type="button">New Game</button>
         <button id="game_menu_button_continue" class="action_button action_button-hollow action_button-hidden" type="button">Continue</button>
+      </div>
+    </section>
+
+    <section id="area_menu" class="modal modal-visible">
+      <div class="modal_inner">
+        <h1 class="visually_hidden">New Area</h1>
+        <div class="container">
+          <div class="container_fill">
+            <img id="area_menu_image" alt="" src="inventory.gif" width="256" />
+            <p class="label-small inventory_category">Now Entering</p>
+            <div id="area_menu_detail" class="inventory_item">
+              <p>hehe</p>
+              <p>haha</p>
+            </div>
+          </div>
+          <button id="shop_menu_open" class="action_button action_button-hollow">Shop</button>
+        </div>
+        <button id="area_menu_close_button" class="action_button" type="button">Back</button>
       </div>
     </section>
 
@@ -636,7 +663,7 @@
         if (level > 24) {
           return 4;
         }
-        if (level > 10) {
+        if (level > 9) {
           return 2;
         }
         return 1;
@@ -849,6 +876,7 @@
       const lootDropEl = document.getElementById('loot');
       // character
       const characterModalEl = document.getElementById('character_menu');
+      const characterLocationEl = document.getElementById('current_location');
       const characterCloseEl = document.getElementById('character_close_button');
       const characterStatsEl = document.getElementById('character_stats');
       // inventory
@@ -870,6 +898,11 @@
       const gameMenuDescriptionEl = document.getElementById('game_menu_description');
       const gameMenuButtonEl = document.getElementById('game_menu_button');
       const gameMenuContinueButtonEl = document.getElementById('game_menu_button_continue');
+      // area menu
+      const areaMenuModalEl = document.getElementById('area_menu');
+      const areaMenuImageEl = document.getElementById('area_menu_image');
+      const areaMenuDetailEl = document.getElementById('area_menu_detail');
+      const areaMenuCloseButtonEl = document.getElementById('area_menu_close_button');
 
       // data binding
       const UI = {
@@ -1089,7 +1122,7 @@
               statEl.innerText = `${stat.name}: ${stat.value}`;
               return statEl;
             });
-            statEls.forEach((statEl) => { el.appendChild(statEl); });
+            statEls.forEach((statEl) => { selectedItemEls.itemEl.appendChild(statEl); });
           },
         },
         inventoryDetailActions: {
@@ -1184,6 +1217,23 @@
             }
           },
         },
+        characterLocation: {
+          element: characterLocationEl,
+          value: (el, state) => {
+            if (state.level < 10) {
+              el.innerText = 'Current Location: Open Field';
+            }
+            if (state.level > 10) {
+              el.innerText = 'Current Location: Dark Woods';
+            }
+            if (state.level > 24) {
+              el.innerText = 'Current Location: Ruined Harbor';
+            }
+            if (state.level > 44) {
+              el.innerText = 'Current Location: Orc Stronghold';
+            }
+          },
+        },
         characterStats: {
           element: characterStatsEl,
           value: (el, state) => {
@@ -1234,6 +1284,50 @@
             gpStatEl.innerHTML = `${state.gp} gp`;
             el.appendChild(gpStatEl);
           },
+        },
+        areaMenu: {
+          element: areaMenuDetailEl,
+          value: (() => {
+            let level;
+            return (el, state) => {
+              el.innerText = null;
+
+              const locationNameEl = document.createElement('p');
+              locationNameEl.classList.add('label-large');
+              const locationDetailEl = document.createElement('p');
+              locationDetailEl.classList.add('label-medium');
+
+              if (state.level < 10) {
+                areaMenuImageEl.src = '';
+                locationNameEl.innerText = 'Open Field';
+                locationDetailEl.innerText = 'Enemies deal 1x damage';
+              }
+
+              if (state.level === 10 && level !== 10) {
+                areaMenuModalEl.classList.add('modal-visible');
+                areaMenuImageEl.src = '';
+                locationNameEl.innerText = 'Dark Woods';
+                locationDetailEl.innerText = 'Enemies deal 2x damage';
+              }
+              if (state.level === 24 && level !== 24) {
+                areaMenuModalEl.classList.add('modal-visible');
+                areaMenuImageEl.src = '';
+                locationNameEl.innerText = 'Ruined Harbor';
+                locationDetailEl.innerText = 'Enemies deal 4x damage';
+              }
+              if (state.level === 44 && level !== 44) {
+                areaMenuModalEl.classList.add('modal-visible');
+                areaMenuImageEl.src = '';
+                locationNameEl.innerText = 'Orc Stronghold';
+                locationDetailEl.innerText = 'Enemies deal 8x damage';
+              }
+
+              el.appendChild(locationNameEl);
+              areaMenuImageEl.src = '';
+              el.appendChild(locationDetailEl);
+              level = state.level;
+            };
+          })(),
         },
       };
       const buildEquippedItems = (inventory, itemType) => {
@@ -1352,6 +1446,9 @@
           woundIndicatorEl.classList.remove('wound-lit');
         }, 875)
       }
+      areaMenuCloseButtonEl.addEventListener('click', () => {
+        areaMenuModalEl.classList.remove('modal-visible');
+      });
 
 
       /* INIT GAME */

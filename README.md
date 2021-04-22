@@ -59,8 +59,9 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
   - [x] accuracy rating
   - [x] damage rating
   - [x] dodge rating
-- [ ] show location (should change when enemy damage bumps up)
-- [ ] Store
+  - [x] current location
+- [ ] show location when enemy damage rate changes
+- [ ] Store Menu
   - [ ] Sell inventory items for GP
   - [ ] Buy items with GP
   - [ ] Encounter store every 3 levels
