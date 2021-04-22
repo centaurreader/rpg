@@ -50,17 +50,27 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
   - [x] Make miss chance an accuracy stat on damage items
   - [x] Make enemy miss chance a dodge stat on armor items
   - [x] show stats in inventory screens
-
-### Later
+- [x] adjust stat scaling to match new calculator
+- [x] Character screen
+  - [x] gp
+  - [x] level
+  - [x] hp
+  - [x] xp + xp to next level
+  - [x] accuracy rating
+  - [x] damage rating
+  - [x] dodge rating
+- [ ] show location (should change when enemy damage bumps up)
 - [ ] Store
   - [ ] Sell inventory items for GP
   - [ ] Buy items with GP
-  - [ ] Randomly encounter store
+  - [ ] Encounter store every 3 levels
+- [ ] Death Orc @ level 60; win after defeating
+
+### Later
 - [ ] Make enemies qualities have effects
   - [ ] Piercing
   - [ ] Leech/Vampire
   - [ ] Armored
-- [ ] Show damage when you click
 - [ ] Show death animation for monsters
 - [ ] More enemy types
 - [ ] PWA compliance

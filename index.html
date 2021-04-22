@@ -224,6 +224,11 @@
         margin-top: 1rem;
         background-color: #2f2c2c;
       }
+      .container-center {
+        align-items: center;
+        justify-content: center;
+        padding-bottom: 6rem;
+      }
       .container_fill {
         flex: 1;
       }
@@ -286,6 +291,11 @@
         align-self: center;
         margin: .5rem 0;
       }
+
+      .stat_list {
+        text-align: center;
+        margin-top: 1rem;
+      }
     </style>
   </head>
   <body>
@@ -298,11 +308,18 @@
             Murder Death Click
           </h1>
         </li>
-        <li class="toolbar--item">
-          <a href="#" id="inventory_button">
-            <img src="inventory.gif" alt="Inventory" height="32" />
-          </a>
-        </li>
+        <div>
+          <li class="toolbar--item">
+            <a href="#" id="character_button">
+              <img src="character-icon.gif" alt="Inventory" height="32" />
+            </a>
+          </li>
+          <li class="toolbar--item">
+            <a href="#" id="inventory_button">
+              <img src="inventory.gif" alt="Inventory" height="32" />
+            </a>
+          </li>
+        </div>
       </ul>
       <div id="dungeon" class="main_container">
         <section class="info_area info_area-player">
@@ -340,6 +357,17 @@
       </div>
       <button id="attack_action" class="action_button" type="button">Attack</button>
     </div>
+
+    <section id="character_menu" class="modal">
+      <div class="modal_inner">
+        <h1 class="visually_hidden">Character</h1>
+        <div class="container container-center">
+          <img src="character.gif" alt="" width="128" />
+          <ul class="stat_list" id="character_stats"></ul>
+        </div>
+        <button id="character_close_button" class="action_button" type="button">Close</button>
+      </div>
+    </section>
 
     <section id="inventory" class="modal">
       <div class="modal_inner">
@@ -453,19 +481,19 @@
       ];
       const lootTable = [
           [
-              { name: 'Amazing', modifier: 9, statType: 'Armor' },
-              { name: 'Bad', modifier: 3, statType: 'Armor' },
-              { name: 'Broken', modifier: 1, statType: 'Armor' },
-              { name: 'Cheap', modifier: 2, statType: 'Armor' },
-              { name: 'Cool', modifier: 8,  statType: 'Armor'},
-              { name: 'Crappy', modifier: 3, statType: 'Armor', },
-              { name: 'Dank', modifier: 10, statType: 'Armor' },
-              { name: 'Fancy', modifier: 6, statType: 'Armor' },
-              { name: 'Heavy', modifier: 7, statType: 'Armor' },
-              { name: 'Magic', modifier: 9, statType: 'Armor' },
-              { name: 'Shiny', modifier: 4, statType: 'Armor' },
-              { name: 'Ugly', modifier: 3, statType: 'Armor' },
-              { name: 'Worthless', modifier: 1, statType: 'Armor' },
+              { name: 'Amazing', modifier: 4.5, statType: 'Armor' },
+              { name: 'Bad', modifier: 1.5, statType: 'Armor' },
+              { name: 'Broken', modifier: .5, statType: 'Armor' },
+              { name: 'Cheap', modifier: 1, statType: 'Armor' },
+              { name: 'Cool', modifier: 4,  statType: 'Armor'},
+              { name: 'Crappy', modifier: 1.5, statType: 'Armor', },
+              { name: 'Dank', modifier: 5, statType: 'Armor' },
+              { name: 'Fancy', modifier: 3, statType: 'Armor' },
+              { name: 'Heavy', modifier: 3.5, statType: 'Armor' },
+              { name: 'Magic', modifier: 4.5, statType: 'Armor' },
+              { name: 'Shiny', modifier: 2, statType: 'Armor' },
+              { name: 'Ugly', modifier: 1.5, statType: 'Armor' },
+              { name: 'Worthless', modifier: .5, statType: 'Armor' },
           ],
           [
             { name: 'Boots', type: 'FEET', modifier: 5, stats: [ { name: 'Dodge', value: 10 } ], statType: 'Armor' },
@@ -538,7 +566,6 @@
         return Math.ceil(translation * (1 + percentageIncrease)**level);
       };
       const calcXp = (xpToAdd) => {
-        const xpCurve = { ten: 1, twenty: 2, }
         const { xp: currentXp, enemy } = gameState.getState();
         const enemyXp = Math.ceil(enemy.level * 2.5);
         const newXp = currentXp + enemyXp;
@@ -584,7 +611,7 @@
               name: `Lvl ${lootLevel} ${lootTable[0][cat1].name} ${lootTable[1][cat2].name}`,
               quality: lootTable[0][cat1],
               type: lootTable[1][cat2],
-              power: (lootTable[0][cat1].modifier * lootTable[1][cat2].modifier) * lootLevel,
+              power: Math.ceil((lootTable[0][cat1].modifier * lootTable[1][cat2].modifier) * lootLevel),
               statType: lootTable[1][cat2].statType,
               equipped: null,
               level: lootLevel,
@@ -602,6 +629,18 @@
           gp: state.gp + goldDropped,
         });
       };
+      const getEnemyDamageModifierForLevel = (level) => {
+        if (level > 44) {
+          return 8;
+        }
+        if (level > 24) {
+          return 4;
+        }
+        if (level > 10) {
+          return 2;
+        }
+        return 1;
+      };
       const genEnemy = () => {
         const state = gameState.getState();
         const level = getEnemyLevelForPlayerLevel(state.level);
@@ -614,11 +653,11 @@
             level: level === 0 ? 1 : level,
             hp: enemyHp,
             maxHp: enemyHp,
-            damage: type.modifier * enemy.modifier * level,
+            damage: type.modifier * enemy.modifier * level * getEnemyDamageModifierForLevel(level),
           },
         });
       };
-      const shouldHit = () => {
+      const getAccuracyRating = () => {
         const { inventory } = gameState.getState();
         const equippedWeapons = inventory.filter((item) => item.equipped && item.equipped.includes('HAND') && item.statType === 'Damage');
         const isUnarmed = equippedWeapons.length === 0;
@@ -628,38 +667,66 @@
           return sum + value;
         }, 0);
         if (isUnarmed) {
-          return true;
+          return 100;
         }
         if (isDualWielding) {
           accuracyRating = (accuracyRating * .8) / 2;
         }
+        return accuracyRating;
+      };
+      const shouldHit = () => {
+        const accuracyRating = getAccuracyRating();
         return Math.floor(Math.random() * 100) > (100 - accuracyRating);
       };
-      const rollDamage = () => {
+      const getDamage = () => {
         const { damage, inventory, level } = gameState.getState();
         const arms = inventory.filter((item) => (item.equipped || '').includes('HAND') && item.statType === 'Damage');
-        const calculatedDamage = (damage * level) + arms.reduce((total, item) => item.power + total, 0);
+        return (damage * level) + arms.reduce((total, item) => item.power + total, 0);
         return shouldHit() ? calculatedDamage : 0;
       };
-      const shouldDodge = () => {
+      const rollDamage = () => {
+        const calculatedDamage = getDamage();
+        return shouldHit() ? calculatedDamage : 0;
+      };
+      const getDodgeRating = () => {
         const { inventory } = gameState.getState();
         const equippedArmor = inventory.filter((item) => item.equipped && item.statType === 'Armor');
-        const dodgeRating = equippedArmor.reduce((sum, curr) => {
+        return equippedArmor.reduce((sum, curr) => {
           const { value } = curr.type.stats ? curr.type.stats.find((stat) => stat.name === 'Dodge') : { value: 0 };
           return sum + value;
         }, 0);
-        return (Math.random() * 100) < dodgeRating;
       };
+      const shouldDodge = () => {
+        const dodgeRating = getDodgeRating();
+        return (Math.random() * 100) < (dodgeRating / 2);
+      };
+      const getMissChanceforLevel = () => {
+        const { level } = gameState.getState();
+        if (level > 44) {
+          return 80;
+        }
+        if (level > 24) {
+          return 60;
+        }
+        if (level > 10) {
+          return 40;
+        }
+        return 20;
+      }
       const shouldMiss = () => {
-        return Math.random() * 100 > 20;
+        return Math.random() * 100 > getMissChanceforLevel();
       };
       const rollEnemyDamage = (enemy) => {
-        return !shouldMiss() && !shouldDodge() ? enemy.damage : 0;
+        const shouldHit = !shouldMiss() && !shouldDodge();
+        return shouldHit ? enemy.damage : 0;
+      };
+      const getArmorRating = () => {
+        const { inventory } = gameState.getState();
+        const equippedHpItems = inventory.filter((item) => item.statType === 'Armor' && !!item.equipped);
+        return equippedHpItems.reduce((total, item) => item.power + total, 0);
       };
       const calcWounds = (damage) => {
-        const { hp, inventory } = gameState.getState();
-        const equippedHpItems = inventory.filter((item) => item.statType === 'Armor' && !!item.equipped);
-        const armorRating = equippedHpItems.reduce((total, item) => item.power + total, 0);
+        const armorRating = getArmorRating();
         const damageMod = armorRating / 10;
         const calcDamage = damage - damageMod;
         return calcDamage > 0 ? Math.ceil(calcDamage) : 0;
@@ -764,6 +831,7 @@
       */
       // main ui
       const titleIconEl = document.getElementById('title_icon');
+      const characterButtonEl = document.getElementById('character_button');
       const inventoryButtonEl = document.getElementById('inventory_button');
       const xpEl = document.getElementById('xp');
       const xpStatusEl = document.getElementById('xp_status');
@@ -779,6 +847,10 @@
       const missEl = document.getElementById('miss');
       const attackButtonEl = document.getElementById('attack_action');
       const lootDropEl = document.getElementById('loot');
+      // character
+      const characterModalEl = document.getElementById('character_menu');
+      const characterCloseEl = document.getElementById('character_close_button');
+      const characterStatsEl = document.getElementById('character_stats');
       // inventory
       const inventoryModalEl = document.getElementById('inventory');
       const gpEl = document.getElementById('gp');
@@ -1112,6 +1184,57 @@
             }
           },
         },
+        characterStats: {
+          element: characterStatsEl,
+          value: (el, state) => {
+            el.innerHTML = null;
+
+            const levelStatEl = document.createElement('li');
+            levelStatEl.classList.add('label-large');
+            levelStatEl.innerText = `Level ${state.level}`;
+            el.appendChild(levelStatEl);
+
+            const hpStatEl = document.createElement('li');
+            hpStatEl.classList.add('label-medium');
+            hpStatEl.innerText = `${state.hp - state.wounds} / ${state.hp} hp`;
+            el.appendChild(hpStatEl);
+
+            const xpStatEl = document.createElement('li');
+            xpStatEl.classList.add('label-medium');
+            xpStatEl.innerText = `${state.xp} / ${getXpForLevel(state.level)} xp`;
+            el.appendChild(xpStatEl);
+
+            const damageEl = document.createElement('li');
+            damageEl.classList.add('label-small');
+            damageEl.innerText = `${getDamage()} damage`;
+            el.appendChild(damageEl);
+
+            const armorEl = document.createElement('li');
+            armorEl.classList.add('label-small');
+            armorEl.innerHTML = `${getArmorRating()} armor`;
+            el.appendChild(armorEl);
+
+            const blockStatEl = document.createElement('li');
+            blockStatEl.classList.add('label-small');
+            blockStatEl.innerHTML = `${Math.ceil(getArmorRating() / 10)} damage block`;
+            el.appendChild(blockStatEl);
+
+            const dodgeEl = document.createElement('li');
+            dodgeEl.classList.add('label-small');
+            dodgeEl.innerHTML = `${getDodgeRating()} dodge`;
+            el.appendChild(dodgeEl);
+            
+            const accuracyEl = document.createElement('li');
+            accuracyEl.classList.add('label-small');
+            accuracyEl.innerHTML = `${getAccuracyRating()} accuracy`;
+            el.appendChild(accuracyEl);
+            
+            const gpStatEl = document.createElement('li');
+            gpStatEl.classList.add('label-small');
+            gpStatEl.innerHTML = `${state.gp} gp`;
+            el.appendChild(gpStatEl);
+          },
+        },
       };
       const buildEquippedItems = (inventory, itemType) => {
         const eSlots = equipmentSlots.filter((slot) => slot.key.includes(itemType));
@@ -1186,6 +1309,12 @@
       }
       attackButtonEl.addEventListener('touchstart', onAttack, { passive: true });
       attackButtonEl.addEventListener('touchend', tick, { passive: true });
+      characterButtonEl.addEventListener('click', () => {
+        characterModalEl.classList.add('modal-visible');
+      });
+      characterCloseEl.addEventListener('click', () => {
+        characterModalEl.classList.remove('modal-visible');
+      });
       inventoryButtonEl.addEventListener('click', () => {
         inventoryModalEl.classList.add('modal-visible');
       });
