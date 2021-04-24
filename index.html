@@ -425,12 +425,12 @@
       </div>
     </section>
 
-    <section id="area_menu" class="modal modal-visible">
+    <section id="area_menu" class="modal">
       <div class="modal_inner">
         <h1 class="visually_hidden">New Area</h1>
         <div class="container">
           <div class="container_fill">
-            <img id="area_menu_image" alt="" src="inventory.gif" width="256" />
+            <img id="area_menu_image" alt="" src="open-field.gif" width="256" />
             <p class="label-small inventory_category">Now Entering</p>
             <div id="area_menu_detail" class="inventory_item">
               <p>hehe</p>
@@ -745,7 +745,8 @@
       };
       const rollEnemyDamage = (enemy) => {
         const shouldHit = !shouldMiss() && !shouldDodge();
-        return shouldHit ? enemy.damage : 0;
+        return 0;
+        // return shouldHit ? enemy.damage : 0;
       };
       const getArmorRating = () => {
         const { inventory } = gameState.getState();
@@ -1297,33 +1298,32 @@
               const locationDetailEl = document.createElement('p');
               locationDetailEl.classList.add('label-medium');
 
-              if (state.level < 10) {
-                areaMenuImageEl.src = '';
+              const dinged10 = state.level === 10 && level && level !== 10;
+              const dinged24 = state.level === 24 && level && level !== 24;
+              const dinged44 = state.level === 44 && level && level !== 44;
+              if (dinged10 || dinged24 || dinged44) {
+                areaMenuModalEl.classList.add('modal-visible');
+              }
+
+              if (state.level >= 44) {
+                areaMenuImageEl.src = 'orc-stronghold.gif';
+                locationNameEl.innerText = 'Orc Stronghold';
+                locationDetailEl.innerText = 'Enemies deal 8x damage';
+              }  else if (state.level >= 24) {
+                areaMenuImageEl.src = 'ruined-harbor.gif';
+                locationNameEl.innerText = 'Ruined Harbor';
+                locationDetailEl.innerText = 'Enemies deal 4x damage';
+              } else if (state.level >= 10) {
+                areaMenuImageEl.src = 'dark-woods.gif';
+                locationNameEl.innerText = 'Dark Woods';
+                locationDetailEl.innerText = 'Enemies deal 2x damage';
+              } else {
+                areaMenuImageEl.src = 'open-field.gif';
                 locationNameEl.innerText = 'Open Field';
                 locationDetailEl.innerText = 'Enemies deal 1x damage';
               }
 
-              if (state.level === 10 && level !== 10) {
-                areaMenuModalEl.classList.add('modal-visible');
-                areaMenuImageEl.src = '';
-                locationNameEl.innerText = 'Dark Woods';
-                locationDetailEl.innerText = 'Enemies deal 2x damage';
-              }
-              if (state.level === 24 && level !== 24) {
-                areaMenuModalEl.classList.add('modal-visible');
-                areaMenuImageEl.src = '';
-                locationNameEl.innerText = 'Ruined Harbor';
-                locationDetailEl.innerText = 'Enemies deal 4x damage';
-              }
-              if (state.level === 44 && level !== 44) {
-                areaMenuModalEl.classList.add('modal-visible');
-                areaMenuImageEl.src = '';
-                locationNameEl.innerText = 'Orc Stronghold';
-                locationDetailEl.innerText = 'Enemies deal 8x damage';
-              }
-
               el.appendChild(locationNameEl);
-              areaMenuImageEl.src = '';
               el.appendChild(locationDetailEl);
               level = state.level;
             };

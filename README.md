@@ -60,16 +60,16 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
   - [x] damage rating
   - [x] dodge rating
   - [x] current location
-- [ ] show location when enemy damage rate changes
+- [x] show location when enemy damage rate changes
   - [x] set location name
   - [x] set location description
-  - [ ] set location image
-    - [ ] open field image
-    - [ ] dark woods image
-    - [ ] ruined harbor image
-    - [ ] orc stronghold image
-  - [ ] open store menu
+  - [x] set location image
+    - [x] open field image
+    - [x] dark woods image
+    - [x] ruined harbor image
+    - [x] orc stronghold image
 - [ ] Store Menu
+  - [ ] Open from area menu
   - [ ] Sell inventory items for GP
   - [ ] Buy items with GP
   - [ ] Encounter store every 3 levels
