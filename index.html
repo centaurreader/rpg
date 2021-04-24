@@ -454,7 +454,7 @@
         let state = {
           xp: 0,
           gp: 0,
-          hp: 100,
+          hp: 200,
           wounds: 0,
           damage: 6,
           level: 1,
@@ -745,8 +745,7 @@
       };
       const rollEnemyDamage = (enemy) => {
         const shouldHit = !shouldMiss() && !shouldDodge();
-        return 0;
-        // return shouldHit ? enemy.damage : 0;
+        return shouldHit ? enemy.damage : 0;
       };
       const getArmorRating = () => {
         const { inventory } = gameState.getState();
@@ -1302,6 +1301,7 @@
               const dinged24 = state.level === 24 && level && level !== 24;
               const dinged44 = state.level === 44 && level && level !== 44;
               if (dinged10 || dinged24 || dinged44) {
+                gameState.setState({ wounds: 0 });
                 areaMenuModalEl.classList.add('modal-visible');
               }
 

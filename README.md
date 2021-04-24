@@ -68,6 +68,7 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
     - [x] dark woods image
     - [x] ruined harbor image
     - [x] orc stronghold image
+  - [x] reset wounds on new area
 - [ ] Store Menu
   - [ ] Open from area menu
   - [ ] Sell inventory items for GP
