@@ -8,7 +8,6 @@
     <meta property="og:url" content="https://centaurreader.com/rpg">
     <meta property="og:image" content="https://centaurreader.com/rpg/hero.gif">
     <title>Murder Death Click by Centaur Reader</title>
-    <link rel="stylesheet" href="reset.css">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;900&display=swap" rel="stylesheet">
 
@@ -36,14 +35,15 @@
     <!— Windows 8.1 + IE11 and above —>
     <meta name="msapplication-config" content="favicons/browserconfig.xml" />
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/style.css">
   </head>
   <body>
     <div class="app">
       <ul class="toolbar">
         <li>
           <h1 class="title">
-            <img id="title_icon" src="helmet.png" height="16" alt="" />
+            <img id="title_icon" src="img/helmet.png" height="16" alt="" />
             &nbsp;
             Murder Death Click
           </h1>
@@ -51,12 +51,12 @@
         <div>
           <li class="toolbar--item">
             <a href="#" id="character_button">
-              <img src="character-icon.gif" alt="Inventory" height="32" />
+              <img src="img/character-icon.gif" alt="Inventory" height="32" />
             </a>
           </li>
           <li class="toolbar--item">
             <a href="#" id="inventory_button">
-              <img src="inventory.gif" alt="Inventory" height="32" />
+              <img src="img/inventory.gif" alt="Inventory" height="32" />
             </a>
           </li>
         </div>
@@ -76,12 +76,12 @@
         </section>
   
         <div class="graphics_area">
-          <img class="sprite sprite-hero" src="hero.gif" alt="" />
+          <img class="sprite sprite-hero" src="img/hero.gif" alt="" />
           <p class="wound" id="wound_indicator"></p>
-          <img id="attack" class="sprite sprite-attack" src="attack.gif" alt="" />
-          <img id="miss" class="sprite sprite-attack" src="miss.gif" alt="" />
-          <img id="enemy" class="sprite sprite-enemy" src="enemy.gif" alt="" />
-          <img class="sprite sprite-background" src="floor.gif" alt="" />
+          <img id="attack" class="sprite sprite-attack" src="img/attack.gif" alt="" />
+          <img id="miss" class="sprite sprite-attack" src="img/miss.gif" alt="" />
+          <img id="enemy" class="sprite sprite-enemy" src="img/enemy.gif" alt="" />
+          <img class="sprite sprite-background" src="img/floor.gif" alt="" />
         </div>
   
         <section class="info_area info_area-enemy">
@@ -103,7 +103,7 @@
         <h1 class="visually_hidden">Character</h1>
         <p id="current_location" class="label-small">Current Location: Open Field</p>
         <div class="container container-center">
-          <img src="character.gif" alt="" width="128" />
+          <img src="img/character.gif" alt="" width="128" />
           <ul class="stat_list" id="character_stats"></ul>
         </div>
         <button id="character_close_button" class="action_button" type="button">Close</button>
@@ -148,7 +148,7 @@
     <section id="game_menu" class="modal modal-visible">
       <div class="modal_inner modal_inner-no_fill game_menu_background">
         <div class="container container-no_fill">
-          <img class="game_menu_logo" src="helmet.png" height="32" width="32" alt="" />
+          <img class="game_menu_logo" src="img/helmet.png" height="32" width="32" alt="" />
           <h1 id="game_menu_title" class="label-large label-center">Murder Death Click</h1>
           <p id="game_menu_description" class="label-small label-center">Murder Orcs. Get Loot. Level Up.</p>
         </div>
@@ -162,7 +162,7 @@
         <h1 class="visually_hidden">New Area</h1>
         <div class="container">
           <div class="container_fill">
-            <img id="area_menu_image" alt="" src="open-field.gif" width="256" />
+            <img id="area_menu_image" alt="" src="img/open-field.gif" width="256" />
             <p class="label-small inventory_category">Now Entering</p>
             <div id="area_menu_detail" class="inventory_item">
               <p>hehe</p>
@@ -175,6 +175,6 @@
       </div>
     </section>
 
-    <script src="mdc.js"></script>
+    <script src="js/mdc.js"></script>
   </body>
 </html>

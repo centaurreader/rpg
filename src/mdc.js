@@ -860,19 +860,19 @@ const UI = {
         }
 
         if (state.level >= 44) {
-          areaMenuImageEl.src = 'orc-stronghold.gif';
+          areaMenuImageEl.src = 'img/orc-stronghold.gif';
           locationNameEl.innerText = 'Orc Stronghold';
           locationDetailEl.innerText = 'Enemies deal 8x damage';
         }  else if (state.level >= 24) {
-          areaMenuImageEl.src = 'ruined-harbor.gif';
+          areaMenuImageEl.src = 'img/ruined-harbor.gif';
           locationNameEl.innerText = 'Ruined Harbor';
           locationDetailEl.innerText = 'Enemies deal 4x damage';
         } else if (state.level >= 10) {
-          areaMenuImageEl.src = 'dark-woods.gif';
+          areaMenuImageEl.src = 'img/dark-woods.gif';
           locationNameEl.innerText = 'Dark Woods';
           locationDetailEl.innerText = 'Enemies deal 2x damage';
         } else {
-          areaMenuImageEl.src = 'open-field.gif';
+          areaMenuImageEl.src = 'img/open-field.gif';
           locationNameEl.innerText = 'Open Field';
           locationDetailEl.innerText = 'Enemies deal 1x damage';
         }

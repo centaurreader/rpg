@@ -250,7 +250,7 @@ body {
 }
 
 .game_menu_background {
-  background-image: url(brick-pattern.gif);
+  background-image: url(../img/brick-pattern.gif);
   padding: 4rem 2rem;
   height: 500px;
   margin: 0 auto;
