@@ -70,17 +70,9 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
     - [x] orc stronghold image
   - [x] reset wounds on new area
 - [ ] Store Menu
-  - [ ] Open from area menu
+  - [x] merchant image
   - [ ] Sell inventory items for GP
+  - [ ] Open from area menu
   - [ ] Buy items with GP
-  - [ ] Encounter store every 3 levels
+  - [ ] Encounter store when area changes
 - [ ] Death Orc @ level 60; win after defeating
-
-### Later
-- [ ] Make enemies qualities have effects
-  - [ ] Piercing
-  - [ ] Leech/Vampire
-  - [ ] Armored
-- [ ] Show death animation for monsters
-- [ ] More enemy types
-- [ ] PWA compliance
