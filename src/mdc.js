@@ -183,7 +183,6 @@ const lootProc = () => {
   const state = gameState.getState();
   const cat1 = Math.floor(Math.random() * lootTable[0].length);
   const cat2 = Math.floor(Math.random() * lootTable[1].length);
-  const type = lootTable[1][cat2].type;
   const lootLevel = rollLootLevel();
   gameState.setState({
     inventory: [
@@ -199,6 +198,16 @@ const lootProc = () => {
       },
     ],
   });
+  inventoryIconEl.classList.add('inventory_icon-lit');
+  setTimeout(() => {
+    inventoryIconEl.classList.remove('inventory_icon-lit');
+    setTimeout(() => {
+      inventoryIconEl.classList.add('inventory_icon-lit');
+      setTimeout(() => {
+        inventoryIconEl.classList.remove('inventory_icon-lit');
+      }, 125);
+    }, 125);
+  }, 125);
 };
 const calcGp = () => {
   const orcGoldMax = 20;
@@ -209,6 +218,9 @@ const calcGp = () => {
   gameState.setState({
     gp: state.gp + goldDropped,
   });
+};
+const getItemValue = (item) => {
+  return item.power * 10 * item.level;
 };
 const getEnemyDamageModifierForLevel = (level) => {
   if (level > 44) {
@@ -263,7 +275,6 @@ const getDamage = () => {
   const { damage, inventory, level } = gameState.getState();
   const arms = inventory.filter((item) => (item.equipped || '').includes('HAND') && item.statType === 'Damage');
   return (damage * level) + arms.reduce((total, item) => item.power + total, 0);
-  return shouldHit() ? calculatedDamage : 0;
 };
 const rollDamage = () => {
   const calculatedDamage = getDamage();
@@ -293,7 +304,7 @@ const getMissChanceforLevel = () => {
     return 40;
   }
   return 20;
-}
+};
 const shouldMiss = () => {
   return Math.random() * 100 > getMissChanceforLevel();
 };
@@ -321,6 +332,7 @@ const reduceEnemyHp = (damage) => {
       hp: newHp <= 0 ? 0 : newHp,
     },
   });
+  save();
 };
 function onAttack() {
   if (attackButtonEl.disabled) {
@@ -414,6 +426,7 @@ function tick() {
 const titleIconEl = document.getElementById('title_icon');
 const characterButtonEl = document.getElementById('character_button');
 const inventoryButtonEl = document.getElementById('inventory_button');
+const inventoryIconEl = document.getElementById('inventory_icon');
 const xpEl = document.getElementById('xp');
 const xpStatusEl = document.getElementById('xp_status');
 const hpEl = document.getElementById('hp');
@@ -673,10 +686,16 @@ const UI = {
 
       const statEls = (state.inventoryItem.type.stats || []).map((stat) => {
         const statEl = document.createElement('p');
+        statEl.classList.add('label-small');
         statEl.innerText = `${stat.name}: ${stat.value}`;
         return statEl;
       });
       statEls.forEach((statEl) => { selectedItemEls.itemEl.appendChild(statEl); });
+
+      const valueEl = document.createElement('p');
+      valueEl.classList.add('label-small');
+      valueEl.innerText = `Value: ${getItemValue(state.inventoryItem)} gp`;
+      selectedItemEls.itemEl.appendChild(valueEl);
     },
   },
   inventoryDetailActions: {
@@ -749,12 +768,14 @@ const UI = {
       const trashItemEl = document.createElement('button');
       trashItemEl.setAttribute('type', 'button');
       trashItemEl.classList.add('action_button', 'action_button-hollow');
-      trashItemEl.innerText = 'Discard';
+      trashItemEl.innerText = 'Sell';
       trashItemEl.addEventListener('click', () => {
         gameState.setState({
           inventory: gameState.getState().inventory.filter((item) => item !== state.inventoryItem),
+          gp: state.gp + getItemValue(state.inventoryItem),
         });
         fromModalSubMenu();
+        save();
       });
       elements.push(trashItemEl);
 

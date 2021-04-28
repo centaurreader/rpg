@@ -69,9 +69,10 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
     - [x] ruined harbor image
     - [x] orc stronghold image
   - [x] reset wounds on new area
+- [x] indicate drops at inventory icon
 - [ ] Store Menu
   - [x] merchant image
-  - [ ] Sell inventory items for GP
+  - [x] Sell inventory items for GP
   - [ ] Open from area menu
   - [ ] Buy items with GP
   - [ ] Encounter store when area changes
