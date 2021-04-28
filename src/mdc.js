@@ -244,7 +244,7 @@ const calcGp = () => {
   });
 };
 const getItemValue = (item) => {
-  return item.power * 5 * item.level;
+  return item.power * 5;
 };
 const getEnemyDamageModifierForLevel = (level) => {
   if (level > 44) {

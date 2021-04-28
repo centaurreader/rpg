@@ -80,4 +80,4 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
     - [x] gen item for each slot; near level
     - [x] add to inv and subtract gp
     - [x] remove from store list
-- [ ] Death Orc @ level 60; win after defeating
+- [ ] Zugare (Death Orc) @ level 60; win after defeating
