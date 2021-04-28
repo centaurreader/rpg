@@ -16,6 +16,8 @@ function State() {
     enemy: null,
     inventoryItem: null,
     inventorySlot: null,
+    shopItems: [],
+    shopItem: null,
     killCount: 0,
   };
   this.getState = () => state;
@@ -146,7 +148,7 @@ const getXpForLevel = (level) => {
   const percentageIncrease = .1;
   return Math.ceil(translation * (1 + percentageIncrease)**level);
 };
-const calcXp = (xpToAdd) => {
+const calcXp = () => {
   const { xp: currentXp, enemy } = gameState.getState();
   const enemyXp = Math.ceil(enemy.level * 2.5);
   const newXp = currentXp + enemyXp;
@@ -159,6 +161,24 @@ const calcLevel = () => {
   const shouldLevelUp = xp >= getXpForLevel(level);
   const hpIfLevelUp = hp + ((level + 1) * 4);
   const woundsIfLevelUp = wounds - (hpIfLevelUp - hp) < 0 ? 0 : wounds - (hpIfLevelUp - hp);
+
+  const dinged10 = shouldLevelUp && level + 1 === 10;
+  const dinged24 = shouldLevelUp && level + 1 === 24;
+  const dinged44 = shouldLevelUp && level + 1 === 44;
+  if (dinged10 || dinged24 || dinged44) {
+    gameState.setState({
+      wounds: 0,
+      shopItems: equipmentSlots.map((slot) => {
+        let slotName = slot.key;
+        if (slotName.includes('HAND')) {
+          slotName = 'HAND';
+        }
+        return rollItem(slotName);
+      }),
+    });
+    areaMenuModalEl.classList.add('modal-visible');
+  }
+
   gameState.setState({
     level: shouldLevelUp ? level + 1 : level,
     xp: shouldLevelUp ? 0 : xp,
@@ -176,26 +196,30 @@ const rollLootLevel = () => {
   const state = gameState.getState();
   return Math.ceil(Math.pow(Math.random(), 3) * (state.level + 2));
 };
+const rollItem = (slot) => {
+  const cat1 = Math.floor(Math.random() * lootTable[0].length);
+  const typeTable = slot ? lootTable[1].filter((type) => type.type === slot) : lootTable[1];
+  const cat2 = Math.floor(Math.random() * typeTable.length);
+  const lootLevel = rollLootLevel();
+  return {
+    name: `Lvl ${lootLevel} ${lootTable[0][cat1].name} ${typeTable[cat2].name}`,
+    quality: lootTable[0][cat1],
+    type: typeTable[cat2],
+    power: Math.ceil((lootTable[0][cat1].modifier * typeTable[cat2].modifier) * lootLevel),
+    statType: typeTable[cat2].statType,
+    equipped: null,
+    level: lootLevel,
+  };
+};
 const lootProc = () => {
   if (!shouldLoot()) {
     return;
   }
   const state = gameState.getState();
-  const cat1 = Math.floor(Math.random() * lootTable[0].length);
-  const cat2 = Math.floor(Math.random() * lootTable[1].length);
-  const lootLevel = rollLootLevel();
   gameState.setState({
     inventory: [
       ...state.inventory,
-      {
-        name: `Lvl ${lootLevel} ${lootTable[0][cat1].name} ${lootTable[1][cat2].name}`,
-        quality: lootTable[0][cat1],
-        type: lootTable[1][cat2],
-        power: Math.ceil((lootTable[0][cat1].modifier * lootTable[1][cat2].modifier) * lootLevel),
-        statType: lootTable[1][cat2].statType,
-        equipped: null,
-        level: lootLevel,
-      },
+      rollItem(),
     ],
   });
   inventoryIconEl.classList.add('inventory_icon-lit');
@@ -220,7 +244,7 @@ const calcGp = () => {
   });
 };
 const getItemValue = (item) => {
-  return item.power * 10 * item.level;
+  return item.power * 5 * item.level;
 };
 const getEnemyDamageModifierForLevel = (level) => {
   if (level > 44) {
@@ -469,7 +493,18 @@ const gameMenuContinueButtonEl = document.getElementById('game_menu_button_conti
 const areaMenuModalEl = document.getElementById('area_menu');
 const areaMenuImageEl = document.getElementById('area_menu_image');
 const areaMenuDetailEl = document.getElementById('area_menu_detail');
+const shopMenuOpenButtonEl = document.getElementById('shop_menu_open');
 const areaMenuCloseButtonEl = document.getElementById('area_menu_close_button');
+// shop menu
+const shopModalEl = document.getElementById('shop_menu');
+const shopSubMenuModalEl = document.getElementById('shop_sub_menu');
+const shopGpEl = document.getElementById('shop_gp');
+const shopItemGpEl = document.getElementById('shop_item_gp');
+const shopItemsEl = document.getElementById('shop_items');
+const shopItemDetailEl = document.getElementById('shop_item_detail');
+const shopItemActionsEl = document.getElementById('shop_item_actions');
+const shopCloseButtonEl = document.getElementById('shop_close_button');
+const shopSubCloseButtonEl = document.getElementById('shop_item_close_button');
 
 // data binding
 const UI = {
@@ -872,14 +907,6 @@ const UI = {
         const locationDetailEl = document.createElement('p');
         locationDetailEl.classList.add('label-medium');
 
-        const dinged10 = state.level === 10 && level && level !== 10;
-        const dinged24 = state.level === 24 && level && level !== 24;
-        const dinged44 = state.level === 44 && level && level !== 44;
-        if (dinged10 || dinged24 || dinged44) {
-          gameState.setState({ wounds: 0 });
-          areaMenuModalEl.classList.add('modal-visible');
-        }
-
         if (state.level >= 44) {
           areaMenuImageEl.src = 'img/orc-stronghold.gif';
           locationNameEl.innerText = 'Orc Stronghold';
@@ -904,10 +931,119 @@ const UI = {
       };
     })(),
   },
+  shopGp: {
+    element: shopGpEl,
+    value: (el, state) => {
+      el.innerHTML = `${el, state.gp} gp`;
+    },
+  },
+  shopItems: {
+    element: shopItemsEl,
+    value: (el, state) => {
+      el.innerHTML = null;
+
+      state.shopItems.forEach((item) => {
+        const itemSlotEl = document.createElement('a');
+        itemSlotEl.addEventListener('click', () => toShopSubMenu(item));
+        itemSlotEl.setAttribute('href', '#');
+        itemSlotEl.classList.add('inventory_item');
+        
+
+        const itemNameEl = document.createElement('p');
+        itemNameEl.classList.add('label-large');
+        itemNameEl.innerText = item.name;
+        itemSlotEl.appendChild(itemNameEl);
+
+        const itemStatEl = document.createElement('p');
+        itemStatEl.classList.add('label-medium');
+        itemStatEl.innerText = `${item.power} ${item.statType}`;
+        itemSlotEl.appendChild(itemStatEl);
+
+        const costEl = document.createElement('p');
+        costEl.classList.add('label-small');
+        costEl.innerText = `${getItemValue(item)} gp`;
+        itemSlotEl.appendChild(costEl);
+
+        el.appendChild(itemSlotEl);
+      });
+    },
+  },
+  shopItemGpEl: {
+    element: shopItemGpEl,
+    value: (el, state) => {
+      el.innerHTML = `${el, state.gp} gp`;
+    },
+  },
+  shopItemDetail: {
+    element: shopItemDetailEl,
+    value: (el, state) => {
+      if (!state.shopItem) {
+        return;
+      }
+      el.innerHTML = null;
+
+      const currentlyEquippedItemsEls = buildEquippedItems(state.inventory, state.shopItem.type.type);
+      const selectedItemEls = buildInventoryDetailItem(
+        'This Item',
+        state.shopItem.name,
+        `${state.shopItem.power} ${state.shopItem.statType}`
+      );
+
+      currentlyEquippedItemsEls.forEach((els) => {
+        el.appendChild(els.labelEl);
+        el.appendChild(els.itemEl);
+      });
+      el.appendChild(selectedItemEls.labelEl);
+      el.appendChild(selectedItemEls.itemEl);
+
+      const statEls = (state.shopItem.type.stats || []).map((stat) => {
+        const statEl = document.createElement('p');
+        statEl.classList.add('label-small');
+        statEl.innerText = `${stat.name}: ${stat.value}`;
+        return statEl;
+      });
+      statEls.forEach((statEl) => { selectedItemEls.itemEl.appendChild(statEl); });
+
+      const valueEl = document.createElement('p');
+      valueEl.classList.add('label-small');
+      valueEl.innerText = `Value: ${getItemValue(state.shopItem)} gp`;
+      selectedItemEls.itemEl.appendChild(valueEl);      
+    },
+  },
+  shopItemActions: {
+    element: shopItemActionsEl,
+    value: (el, state) => {
+      if (!state.shopItem) {
+        return;
+      }
+      el.innerHTML = null;
+
+      const buyItemEl = document.createElement('button');
+      buyItemEl.setAttribute('type', 'button');
+      buyItemEl.classList.add('action_button', 'action_button-hollow');
+      buyItemEl.innerText = 'Buy';
+      if (getItemValue(state.shopItem) > state.gp) {
+        buyItemEl.disabled = true;
+      }
+      buyItemEl.addEventListener('click', () => {
+        gameState.setState({
+          inventory: [
+            ...state.inventory,
+            { ...state.shopItem, },
+          ],
+          shopItems: state.shopItems.filter((shopItem) => shopItem !== state.shopItem),
+          gp: state.gp - getItemValue(state.shopItem),
+        });
+        fromShopSubMenu();
+        save();
+        updateUi(gameState.getState());
+      });
+      el.appendChild(buyItemEl);
+    },
+  },
 };
 const buildEquippedItems = (inventory, itemType) => {
   const eSlots = equipmentSlots.filter((slot) => slot.key.includes(itemType));
-  const currentlyEquippedItems = inventory.filter((item) => eSlots.some(slot => slot.key === item.equipped));
   const currentlyEquippedItemsEls = eSlots.map((slot) => {
     let currentlyEquippedItemEls = buildInventoryDetailItem(
       `Equipped: ${slot.value}`,
@@ -966,7 +1102,6 @@ gameMenuButtonEl.addEventListener('click', () => {
   attackButtonEl.disabled = false;
   gameMenuModalEl.classList.remove('modal-visible');
   gameMenuTitleEl.innerText = 'Murder Death Click';
-  const killCount = new Intl.NumberFormat(navigator.language).format(gameState.getState().killCount);
   gameMenuDescriptionEl.innerText = 'Murder Orcs. Get Loot. Level Up.';
 });
 gameMenuContinueButtonEl.addEventListener('click', () => {
@@ -993,9 +1128,11 @@ inventoryCloseEl.addEventListener('click', () => {
 function toSlotSubMenu(slot) {
   gameState.setState({ inventorySlot: slot });
   updateUi(gameState.getState());
+  inventoryModalEl.classList.add('modal-sub');
   inventorySlotModalEl.classList.add('modal-visible');
 }
 function fromSlotSubMenu(slot) {
+  inventoryModalEl.classList.remove('modal-sub');
   inventorySlotModalEl.classList.remove('modal-visible');
   gameState.setState({ inventorySlot: null });
 }
@@ -1021,9 +1158,29 @@ function showWound(text) {
     woundIndicatorEl.classList.remove('wound-lit');
   }, 875)
 }
+shopMenuOpenButtonEl.addEventListener('click', () => {
+  areaMenuModalEl.classList.add('modal-sub');
+  shopModalEl.classList.add('modal-visible');
+});
 areaMenuCloseButtonEl.addEventListener('click', () => {
   areaMenuModalEl.classList.remove('modal-visible');
 });
+shopCloseButtonEl.addEventListener('click', () => {
+  areaMenuModalEl.classList.remove('modal-sub');
+  shopModalEl.classList.remove('modal-visible');
+});
+function toShopSubMenu(item) {
+  gameState.setState({ shopItem: item });
+  updateUi(gameState.getState());
+  shopModalEl.classList.add('modal-sub');
+  shopSubMenuModalEl.classList.add('modal-visible');
+}
+function fromShopSubMenu() {
+  shopModalEl.classList.remove('modal-sub');
+  shopSubMenuModalEl.classList.remove('modal-visible');
+  gameState.setState({ shopItem: null });
+}
+shopSubCloseButtonEl.addEventListener('click', fromShopSubMenu);
 
 
 /* INIT GAME */

@@ -70,10 +70,14 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
     - [x] orc stronghold image
   - [x] reset wounds on new area
 - [x] indicate drops at inventory icon
-- [ ] Store Menu
+- [x] Store Menu
   - [x] merchant image
   - [x] Sell inventory items for GP
-  - [ ] Open from area menu
-  - [ ] Buy items with GP
-  - [ ] Encounter store when area changes
+  - [x] Open from area menu
+  - [x] Buy items with GP
+    - [x] display items
+    - [x] display item
+    - [x] gen item for each slot; near level
+    - [x] add to inv and subtract gp
+    - [x] remove from store list
 - [ ] Death Orc @ level 60; win after defeating
