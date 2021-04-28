@@ -81,3 +81,5 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
     - [x] add to inv and subtract gp
     - [x] remove from store list
 - [ ] Zugare (Death Orc) @ level 60; win after defeating
+  - [ ] display an "enemy approaching" type modal when this is triggered
+- [ ] add a link to the root site to the game menu
