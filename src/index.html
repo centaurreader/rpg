@@ -169,9 +169,36 @@
               <p>haha</p>
             </div>
           </div>
-          <!-- <button id="shop_menu_open" class="action_button action_button-hollow">Shop</button> -->
+          <button id="shop_menu_open" class="action_button action_button-hollow">Shop</button>
         </div>
         <button id="area_menu_close_button" class="action_button" type="button">Back</button>
+      </div>
+    </section>
+
+    <section id="shop_menu" class="modal">
+      <div class="modal_inner">
+        <h1 class="visually_hidden">Shop</h1>
+        <p id="shop_gp" class="label-small">1,000,000 gp</p>
+        <div class="container">
+          <div class="container_fill">
+            <img id="shop_menu_image" alt="" src="img/merchant.gif" width="128" />
+            <p class="label-small inventory_category">For Sale</p>
+            <div id="shop_items" class="container_fill"></div>
+          </div>
+        </div>
+        <button id="shop_close_button" class="action_button" type="button">Back</button>
+      </div>
+    </section>
+
+    <section id="shop_sub_menu" class="modal">
+      <div class="modal_inner">
+        <h1 class="visually_hidden">Shop Item</h1>
+        <p id="shop_item_gp" class="label-small">1,000,000 gp</p>
+        <div class="container">
+          <div id="shop_item_detail" class="container_fill"></div>
+          <div id="shop_item_actions"></div>
+        </div>
+        <button id="shop_item_close_button" class="action_button" type="button">Back</button>
       </div>
     </section>
 

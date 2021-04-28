@@ -182,10 +182,13 @@ body {
   text-align: right;
   margin-top: 1rem;
 }
+#shop_menu_image,
 #area_menu_image {
   margin: 1rem auto 2rem;
   display: block;
 }
+#shop_item_gp,
+#shop_gp,
 #gp {
   text-align: right;
   margin-top: 1rem;
