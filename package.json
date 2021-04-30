@@ -1,6 +1,6 @@
 {
   "name": "mdc",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "description": "RPG gameplay distilled to its purest essence. [Play the game](https://centaurreader.com/rpg).",
   "scripts": {
     "build:game": "esbuild ./src/mdc.js --bundle --outfile=dist/mdc.js --minify",

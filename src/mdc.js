@@ -168,7 +168,6 @@ const calcLevel = () => {
   const dinged = dinged10 || dinged24 || dinged44;
   if (dinged10 || dinged24 || dinged44) {
     gameState.setState({
-      wounds: 0,
       shopItems: equipmentSlots.map((slot) => {
         let slotName = slot.key;
         if (slotName.includes('HAND')) {
