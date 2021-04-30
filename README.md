@@ -84,4 +84,4 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
   - [x] spawn @ level 60
   - [x] boss approaching dialog
   - [x] You Win UI after defeating w/ new game button
-- [ ] add a link to the root site to the game menu
+- [x] add a link to the root site to the game menu

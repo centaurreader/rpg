@@ -315,3 +315,10 @@ input {
   font-size: 1rem;
   margin-top: .5rem;
 }
+
+.by {
+  margin-top: 1rem;
+}
+.by a {
+  color: #f6e8e8;
+}
