@@ -159,12 +159,13 @@ const calcXp = () => {
 const calcLevel = () => {
   const { xp, level, hp, wounds } = gameState.getState();
   const shouldLevelUp = xp >= getXpForLevel(level);
-  const hpIfLevelUp = hp + ((level + 1) * 4);
+  const hpIfLevelUp = 10 * ((level - 1) * (level + 2)) + 200;
   const woundsIfLevelUp = wounds - (hpIfLevelUp - hp) < 0 ? 0 : wounds - (hpIfLevelUp - hp);
 
   const dinged10 = shouldLevelUp && level + 1 === 10;
   const dinged24 = shouldLevelUp && level + 1 === 24;
   const dinged44 = shouldLevelUp && level + 1 === 44;
+  const dinged = dinged10 || dinged24 || dinged44;
   if (dinged10 || dinged24 || dinged44) {
     gameState.setState({
       wounds: 0,
@@ -183,7 +184,7 @@ const calcLevel = () => {
     level: shouldLevelUp ? level + 1 : level,
     xp: shouldLevelUp ? 0 : xp,
     hp: shouldLevelUp ? hpIfLevelUp : hp,
-    wounds: shouldLevelUp ? woundsIfLevelUp : wounds,
+    wounds: dinged ? 0 : (shouldLevelUp ? woundsIfLevelUp : wounds),
   });
 };
 const shouldLoot = () => {
