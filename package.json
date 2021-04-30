@@ -1,0 +1,23 @@
+{
+  "name": "mdc",
+  "version": "1.1.0",
+  "description": "RPG gameplay distilled to its purest essence. [Play the game](https://centaurreader.com/rpg).",
+  "scripts": {
+    "build:game": "esbuild ./src/mdc.js --bundle --outfile=dist/mdc.js --minify",
+    "build:cheat": "esbuild ./src/cheat.js --bundle --outfile=dist/cheat.js --minify",
+    "build": "npm run build:game && npm run build:cheat"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/centaurreader/rpg.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/centaurreader/rpg/issues"
+  },
+  "homepage": "https://centaurreader.com/rpg",
+  "devDependencies": {
+    "esbuild": "^0.11.16"
+  }
+}
