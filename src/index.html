@@ -103,6 +103,7 @@
         <h1 class="visually_hidden">Character</h1>
         <p id="current_location" class="label-small">Current Location: Open Field</p>
         <div class="container container-center">
+          <p class="label-large you_won you_won-hidden">Orcs Defeated</p>
           <img src="img/character.gif" alt="" width="128" />
           <ul class="stat_list" id="character_stats"></ul>
         </div>
@@ -202,6 +203,28 @@
       </div>
     </section>
 
+    <section id="boss_dialog" class="dialog">
+      <h1 class="label-large label-center">Boss Approaching!</h1>
+      <button id="boss_dialog_close" type="button" class="action_button action_button-hollow action_button-danger">Fight</button>
+    </section>
+
+    <section id="cheat" class="modal">
+      <div style="display: flex; flex-direction: column; max-width: 500px; margin: 0 auto; padding: .5rem;">
+        <label>xp</label>
+        <input type="number" id="cheat_xp" />
+        <br />
+        <label>level</label>
+        <input type="number" id="cheat_level" />
+        <br />
+        <label>hp</label>
+        <input type="number" id="cheat_hp" />
+        <br />
+        <button class="action_button action_button-hollow" type="button" id="boss_skip">Zugare</button>
+        <button class="action_button action_button-hollow" type="button" id="cheat_close">close</button>
+      </div>
+    </section>
+
     <script src="mdc.js"></script>
+    <script src="cheat.js"></script>
   </body>
 </html>

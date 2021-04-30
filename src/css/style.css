@@ -150,6 +150,11 @@ body {
   border: 4px solid #f6e8e8;
   color: #f6e8e8;
 }
+.action_button-danger {
+  background-color: #300f02;
+  color: #f6e8e8;
+  border-color: #f6e8e8;
+}
 .modal {
   position: fixed;
   top: 0;
@@ -274,4 +279,39 @@ body {
 .stat_list {
   text-align: center;
   margin-top: 1rem;
+}
+
+.dialog {
+  position: fixed;
+  top: 20vh;
+  z-index: 10000;
+  border: 10px solid #C93900;
+  background-color: #300f02;
+  width: 90%;
+  padding: 2rem 2rem 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .125s;
+}
+.dialog-visible {
+  opacity: 1;
+  visibility: visible;
+}
+.dialog h1 { margin-bottom: 2rem; }
+.you_won {
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
+.you_won-hidden {
+  display: none;
+}
+input {
+  border: 2px solid #f6e8e8;
+  background-color: transparent;
+  padding: .5rem;
+  color: #f6e8e8;
+  font-size: 1rem;
+  margin-top: .5rem;
 }

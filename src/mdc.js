@@ -260,19 +260,33 @@ const getEnemyDamageModifierForLevel = (level) => {
 };
 const genEnemy = () => {
   const state = gameState.getState();
-  const level = getEnemyLevelForPlayerLevel(state.level);
-  const type = enemyTable[0][Math.floor(Math.random() * enemyTable[0].length)];
-  const enemy = enemyTable[1][Math.floor(Math.random() * enemyTable[1].length)];
-  const enemyHp = (type.modifier + level) * (enemy.modifier + level);
-  gameState.setState({
-    enemy: {
-      name: `${type.name} ${enemy.name}`,
-      level: level === 0 ? 1 : level,
-      hp: enemyHp,
-      maxHp: enemyHp,
-      damage: type.modifier * enemy.modifier * level * getEnemyDamageModifierForLevel(level),
-    },
-  });
+  if (state.level === 60) {
+    gameState.setState({
+      enemy: {
+        name: 'Zugare',
+        level: 60,
+        hp: 10000,
+        maxHp: 10000,
+        damage: 3400,
+        image: 'img/boss.gif',
+      },
+    });
+  } else {
+    const level = getEnemyLevelForPlayerLevel(state.level);
+    const type = enemyTable[0][Math.floor(Math.random() * enemyTable[0].length)];
+    const enemy = enemyTable[1][Math.floor(Math.random() * enemyTable[1].length)];
+    const enemyHp = (type.modifier + level) * (enemy.modifier + level);
+    gameState.setState({
+      enemy: {
+        name: `${type.name} ${enemy.name}`,
+        level: level === 0 ? 1 : level,
+        hp: enemyHp,
+        maxHp: enemyHp,
+        damage: type.modifier * enemy.modifier * level * getEnemyDamageModifierForLevel(level),
+        image: 'img/enemy.gif',
+      },
+    });
+  }
 };
 const getAccuracyRating = () => {
   const { inventory } = gameState.getState();
@@ -395,6 +409,13 @@ function incrementKillCount() {
     killCount: gameState.getState().killCount + 1,
   });
 }
+function didWin() {
+  const { enemy, level } = gameState.getState();
+  if (enemy.name === 'Zugare') {
+    return true;
+  }
+  return false;
+}
 function tick() {
   if (attackButtonEl.disabled) {
     return;
@@ -420,9 +441,24 @@ function tick() {
       calcLevel();
       lootProc();
       calcGp();
-      genEnemy();
-      updateUi(gameState.getState());
-      save();
+      if (didWin()) {
+        document.querySelector('.you_won').classList.remove('you_won-hidden');
+        characterCloseEl.innerText = 'New Game';
+        characterCloseEl.removeEventListener('click', closeCharacterMenu);
+        characterCloseEl.addEventListener('click', () => {
+          localStorage.removeItem('rpg-state');
+          load();
+          characterModalEl.classList.remove('modal-visible');
+          characterCloseEl.addEventListener('click', closeCharacterMenu);
+          characterCloseEl.innerText = 'Close';
+          document.querySelector('.you_won').classList.add('you_won-hidden');
+        });
+        characterModalEl.classList.add('modal-visible');
+      } else {
+        genEnemy();
+        updateUi(gameState.getState());
+        save();
+      }
     }, 250);
   } else {
     updateUi(gameState.getState());
@@ -457,6 +493,7 @@ const hpEl = document.getElementById('hp');
 const hpStatusEl = document.getElementById('hp_status');
 const levelEl = document.getElementById('level');
 const woundIndicatorEl = document.getElementById('wound_indicator');
+const enemyImageEl = document.getElementById('enemy');
 const enemyNameEl = document.getElementById('enemy_name');
 const enemyLevelEl = document.getElementById('enemy_level');
 const enemyHpEl = document.getElementById('enemy_hp');
@@ -505,6 +542,9 @@ const shopItemDetailEl = document.getElementById('shop_item_detail');
 const shopItemActionsEl = document.getElementById('shop_item_actions');
 const shopCloseButtonEl = document.getElementById('shop_close_button');
 const shopSubCloseButtonEl = document.getElementById('shop_item_close_button');
+// boss dialog
+const bossDialogEl = document.getElementById('boss_dialog');
+const bossDialogCloseEl = document.getElementById('boss_dialog_close');
 
 // data binding
 const UI = {
@@ -565,6 +605,12 @@ const UI = {
         lastLootIndex = state.inventory.length - 1;
       };
     })(),
+  },
+  enemyImage: {
+    element: enemyImageEl,
+    value: (el, state) => {
+      el.src = state.enemy.image || 'img/enemy.gif';
+    },
   },
   enemyName: {
     element: enemyNameEl,
@@ -864,6 +910,11 @@ const UI = {
       xpStatEl.innerText = `${state.xp} / ${getXpForLevel(state.level)} xp`;
       el.appendChild(xpStatEl);
 
+      const killCountEl = document.createElement('li');
+      killCountEl.classList.add('label-medium');
+      killCountEl.innerText = `${state.killCount} orcs killed`;
+      el.appendChild(killCountEl);
+
       const damageEl = document.createElement('li');
       damageEl.classList.add('label-small');
       damageEl.innerText = `${getDamage()} damage`;
@@ -1041,6 +1092,18 @@ const UI = {
       el.appendChild(buyItemEl);
     },
   },
+  bossDialog: {
+    element: bossDialogEl,
+    value: (() => {
+      let level;
+      return (el, state) => {
+        if (level && level !== 60 && state.level === 60) {
+          el.classList.add('dialog-visible');
+        }
+        level = state.level;
+      };
+    })(),
+  },
 };
 const buildEquippedItems = (inventory, itemType) => {
   const eSlots = equipmentSlots.filter((slot) => slot.key.includes(itemType));
@@ -1116,9 +1179,10 @@ attackButtonEl.addEventListener('touchend', tick, { passive: true });
 characterButtonEl.addEventListener('click', () => {
   characterModalEl.classList.add('modal-visible');
 });
-characterCloseEl.addEventListener('click', () => {
+characterCloseEl.addEventListener('click', closeCharacterMenu);
+function closeCharacterMenu() {
   characterModalEl.classList.remove('modal-visible');
-});
+}
 inventoryButtonEl.addEventListener('click', () => {
   inventoryModalEl.classList.add('modal-visible');
 });
@@ -1181,7 +1245,9 @@ function fromShopSubMenu() {
   gameState.setState({ shopItem: null });
 }
 shopSubCloseButtonEl.addEventListener('click', fromShopSubMenu);
-
+bossDialogCloseEl.addEventListener('click', () => {
+  bossDialogEl.classList.remove('dialog-visible');
+});
 
 /* INIT GAME */
 load();
