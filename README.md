@@ -85,3 +85,12 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
   - [x] boss approaching dialog
   - [x] You Win UI after defeating w/ new game button
 - [x] add a link to the root site to the game menu
+- [x] (bug) equipment slot items are not links
+- [x] scale bottom of drops up when in new areas
+- [x] adjust damage formula
+  - [x] ruined harbor too strong
+  - [x] orc stronghold too strong
+
+### v1.2
+- [ ] go to inventory from shop
+- [ ] drill into inventory infinitely

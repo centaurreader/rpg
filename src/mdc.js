@@ -193,8 +193,10 @@ const shouldLoot = () => {
   return skewed > limit;
 };
 const rollLootLevel = () => {
-  const state = gameState.getState();
-  return Math.ceil(Math.pow(Math.random(), 3) * (state.level + 2));
+  const { level } = gameState.getState();
+  const min = Math.abs(level - 5);
+  const max = level + 2;
+  return Math.ceil(Math.pow(Math.random(), 3) * (max - min) + min);
 };
 const rollItem = (slot) => {
   const cat1 = Math.floor(Math.random() * lootTable[0].length);
@@ -248,10 +250,10 @@ const getItemValue = (item) => {
 };
 const getEnemyDamageModifierForLevel = (level) => {
   if (level > 44) {
-    return 8;
+    return 4;
   }
   if (level > 24) {
-    return 4;
+    return 3;
   }
   if (level > 9) {
     return 2;
@@ -733,12 +735,25 @@ const UI = {
       ));
 
       currentlyEquippedItemsEls.forEach((els) => {
+        const containerEl = document.createElement('a');
+        containerEl.addEventListener('click', (e) => { e.preventDefault(); });
+        containerEl.setAttribute('href', '#');
+        containerEl.classList.add('inventory_item');
+
         el.appendChild(els.labelEl);
-        el.appendChild(els.itemEl);
+        containerEl.appendChild(els.itemEl);
+
+        el.appendChild(containerEl);
       });
       el.appendChild(inventoryItemTypeEl);
       itemsForSlotEls.forEach((els) => {
-        el.appendChild(els.itemEl);
+        const containerEl = document.createElement('a');
+        containerEl.addEventListener('click', (e) => { e.preventDefault(); });
+        containerEl.setAttribute('href', '#');
+        containerEl.classList.add('inventory_item');
+
+        containerEl.appendChild(els.itemEl);
+        el.appendChild(containerEl);
       });
     },
   },
@@ -759,9 +774,17 @@ const UI = {
       );
 
       currentlyEquippedItemsEls.forEach((els) => {
+        const containerEl = document.createElement('a');
+        containerEl.addEventListener('click', (e) => { e.preventDefault(); });
+        containerEl.setAttribute('href', '#');
+        containerEl.classList.add('inventory_item');
+
         el.appendChild(els.labelEl);
-        el.appendChild(els.itemEl);
+
+        containerEl.appendChild(els.itemEl);
+        el.appendChild(containerEl);
       });
+      selectedItemEls.itemEl.classList.remove('inventory_item');
       el.appendChild(selectedItemEls.labelEl);
       el.appendChild(selectedItemEls.itemEl);
 
@@ -961,11 +984,11 @@ const UI = {
         if (state.level >= 44) {
           areaMenuImageEl.src = 'img/orc-stronghold.gif';
           locationNameEl.innerText = 'Orc Stronghold';
-          locationDetailEl.innerText = 'Enemies deal 8x damage';
+          locationDetailEl.innerText = 'Enemies deal 4x damage';
         }  else if (state.level >= 24) {
           areaMenuImageEl.src = 'img/ruined-harbor.gif';
           locationNameEl.innerText = 'Ruined Harbor';
-          locationDetailEl.innerText = 'Enemies deal 4x damage';
+          locationDetailEl.innerText = 'Enemies deal 3x damage';
         } else if (state.level >= 10) {
           areaMenuImageEl.src = 'img/dark-woods.gif';
           locationNameEl.innerText = 'Dark Woods';
