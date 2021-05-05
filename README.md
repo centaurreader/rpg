@@ -96,9 +96,7 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [x] sell from unequipped list
 - [x] show feedback when pressing buttons
 - [x] go to inventory from shop (to allow selling)
-- [ ] make accuracy reduce damage amount instead of completely missing
-  - [ ] move misses back to being a random slim chance
-  - [x] always hit after 2 consecutive misses
+- [x] always hit after 2 consecutive misses
 
 ### v1.3
 - [ ] add permanent upgrades for purchase on death (roguelite ish)
