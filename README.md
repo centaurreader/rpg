@@ -110,4 +110,6 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
   - [ ] Marksman: +20 accuracy
 - [ ] select buff on death
 - [ ] display buffs in character screen, on death
+  - [ ] 0 gp on new game
+  - [ ] only allow to buy one upgrade
 - [ ] start new game (reset buffs)
