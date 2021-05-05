@@ -50,6 +50,9 @@ body {
   background-color: #2f2c2c;
   display: inline-block;
 }
+.toolbar--item + .toolbar--item {
+  margin-left: .5rem;
+}
 .toolbar--item a {
   display: block;
 }
