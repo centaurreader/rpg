@@ -99,7 +99,8 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [x] always hit after 2 consecutive misses
 
 ### v1.3
-- [ ] add width and height to all images
+- [x] add width and height to all images
+- [x] defer css loading for custom font
 - [ ] add permanent upgrades for purchase on death (roguelite ish)
   - [ ] Alchemist: gain health pot when you go to an area
   - [ ] Drain: 1% life steal on hit
