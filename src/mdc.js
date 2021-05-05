@@ -699,6 +699,7 @@ const UI = {
       const unequipped = state.inventory.filter((item) => !item.equipped);
       unequipped.forEach((item) => {
         const itemEl = document.createElement('li');
+        itemEl.classList.add('inventory_list_item');
 
         const itemLinkEl = document.createElement('a');
         itemLinkEl.addEventListener('click', () => toModalSubMenu(item));
@@ -715,6 +716,16 @@ const UI = {
         statEl.innerHTML = `${item.power} ${item.statType}`;
         statEl.classList.add('label-medium');
         itemLinkEl.appendChild(statEl);
+
+        const sellButtonEl = document.createElement('button');
+        sellButtonEl.setAttribute('type', 'button');
+        sellButtonEl.classList.add('action_button', 'action_button-hollow', 'action_button-small', 'inventory_item_action');
+        sellButtonEl.innerText = 'Sell';
+        sellButtonEl.addEventListener('click', () => {
+          sellItem(item);
+          updateUi(gameState.getState());
+        });
+        itemEl.appendChild(sellButtonEl);
 
         el.appendChild(itemEl);
       });
@@ -883,12 +894,8 @@ const UI = {
       trashItemEl.classList.add('action_button', 'action_button-hollow');
       trashItemEl.innerText = 'Sell';
       trashItemEl.addEventListener('click', () => {
-        gameState.setState({
-          inventory: gameState.getState().inventory.filter((item) => item !== state.inventoryItem),
-          gp: state.gp + getItemValue(state.inventoryItem),
-        });
+        sellItem(state.inventoryItem);
         fromModalSubMenu();
-        save();
       });
       elements.push(trashItemEl);
 
@@ -1137,6 +1144,13 @@ const UI = {
     })(),
   },
 };
+const sellItem = (itemToSell) => {
+  gameState.setState({
+    inventory: gameState.getState().inventory.filter((item) => item !== itemToSell),
+    gp: gameState.getState().gp + getItemValue(itemToSell),
+  });
+  save();
+}
 const buildEquippedItems = (inventory, itemType) => {
   const eSlots = equipmentSlots.filter((slot) => slot.key.includes(itemType));
   const currentlyEquippedItemsEls = eSlots.map((slot) => {
