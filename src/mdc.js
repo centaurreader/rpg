@@ -28,6 +28,7 @@ function State() {
     shopItems: [],
     shopItem: null,
     killCount: 0,
+    missCount: 0,
   };
   this.getState = () => state;
   this.setState = incoming => {
@@ -318,7 +319,24 @@ const getAccuracyRating = () => {
 };
 const shouldHit = () => {
   const accuracyRating = getAccuracyRating();
-  return Math.floor(Math.random() * 100) > (100 - accuracyRating);
+  const willHit = Math.floor(Math.random() * 100) > (100 - accuracyRating);
+  if (!willHit) {
+    const { missCount } = gameState.getState();
+    gameState.setState({
+      missCount: missCount + 1,
+    });
+    if (missCount + 1 > 2) {
+      gameState.setState({
+        missCount: 0,
+      });
+      return true;
+    } else {
+      gameState.setState({
+        missCount: missCount + 1,
+      });
+    }
+  }
+  return willHit;
 };
 const getDamage = () => {
   const { damage, inventory, level } = gameState.getState();
