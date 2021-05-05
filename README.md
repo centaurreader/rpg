@@ -92,7 +92,7 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
   - [x] orc stronghold too strong
 
 ### v1.2
-- [ ] trigger attack with spacebar
+- [x] trigger attack with spacebar
 - [ ] go to inventory from shop (to allow selling)
 - [ ] sell from unequipped list
 - [ ] make accuracy reduce damage amount instead of completely missing

@@ -3,6 +3,15 @@
   BEGIN GAME
   \\\\\\\\\\
 */
+// util
+function debounce(func, delay) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => func(...args), delay);
+  };
+}
+
 // state
 function State() {
   let state = {
@@ -1199,6 +1208,14 @@ if (typeof window.ontouchstart === 'undefined') {
 }
 attackButtonEl.addEventListener('touchstart', onAttack, { passive: true });
 attackButtonEl.addEventListener('touchend', tick, { passive: true });
+
+document.addEventListener('keypress', debounce((e) => {
+  e.preventDefault();
+  if (e.key === ' ') {
+    onAttack();
+    tick();
+  }
+}, 125));
 characterButtonEl.addEventListener('click', () => {
   characterModalEl.classList.add('modal-visible');
 });
