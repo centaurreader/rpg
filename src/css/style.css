@@ -50,6 +50,13 @@ body {
   background-color: #2f2c2c;
   display: inline-block;
 }
+.toolbar--item a {
+  display: block;
+}
+.toolbar--item a:active {
+  background: #C93900;
+  height: 100%;
+}
 .inventory_icon {
   background-color: transparent;
   transition: background-color .125s;
