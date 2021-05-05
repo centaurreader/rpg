@@ -108,4 +108,6 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
   - [ ] Refined: chance to drop higher quality loot
   - [ ] Nimble: +20 dodge
   - [ ] Marksman: +20 accuracy
+- [ ] select buff on death
+- [ ] display buffs in character screen, on death
 - [ ] start new game (reset buffs)
