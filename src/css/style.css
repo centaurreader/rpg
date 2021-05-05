@@ -190,6 +190,14 @@ body {
 .modal-visible {
   transform: translateY(0);
 }
+.modal_top_bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.modal_top_bar > .toolbar--item {
+  margin-left: .75rem;
+}
 .modal-sub {
   transform: translate(-100%, 0);
 }
@@ -213,8 +221,8 @@ body {
   margin: 1rem auto 2rem;
   display: block;
 }
+.modal_top_bar,
 #shop_item_gp,
-#shop_gp,
 #gp {
   text-align: right;
   margin-top: 1rem;
@@ -236,6 +244,11 @@ body {
 }
 .container_fill {
   flex: 1;
+}
+#inventory,
+#inventory_detail,
+#inventory_slot {
+  z-index: 1001;
 }
 .inventory_category {
   background-color: #f6e8e8;

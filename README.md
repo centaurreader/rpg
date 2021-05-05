@@ -94,9 +94,19 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 ### v1.2
 - [x] trigger attack with spacebar
 - [x] sell from unequipped list
+- [x] show feedback when pressing buttons
+- [x] go to inventory from shop (to allow selling)
 - [ ] make accuracy reduce damage amount instead of completely missing
   - [ ] move misses back to being a random slim chance
   - [ ] always hit after 2 consecutive misses
-- [ ] go to inventory from shop (to allow selling)
-- [ ] add 1x heal; gain 1 each new area
+
+### v1.3
 - [ ] add permanent upgrades for purchase on death (roguelite ish)
+  - [ ] Alchemist: gain health pot when you go to an area
+  - [ ] Drain: 1% life steal on hit
+  - [ ] Overpower: critical hit chance
+  - [ ] Cleave: chance to strike twice
+  - [ ] Scavenger: chance to drop loot
+  - [ ] Refined: chance to drop higher quality loot
+  - [ ] Nimble: +20 dodge
+  - [ ] Marksman: +20 accuracy

@@ -547,6 +547,7 @@ const areaMenuCloseButtonEl = document.getElementById('area_menu_close_button');
 const shopModalEl = document.getElementById('shop_menu');
 const shopSubMenuModalEl = document.getElementById('shop_sub_menu');
 const shopGpEl = document.getElementById('shop_gp');
+const shopInventoryButtonEl = document.getElementById('shop_inventory_button');
 const shopItemGpEl = document.getElementById('shop_item_gp');
 const shopItemsEl = document.getElementById('shop_items');
 const shopItemDetailEl = document.getElementById('shop_item_detail');
@@ -1287,6 +1288,9 @@ areaMenuCloseButtonEl.addEventListener('click', () => {
 shopCloseButtonEl.addEventListener('click', () => {
   areaMenuModalEl.classList.remove('modal-sub');
   shopModalEl.classList.remove('modal-visible');
+});
+shopInventoryButtonEl.addEventListener('click', () => {
+  inventoryModalEl.classList.add('modal-visible');
 });
 function toShopSubMenu(item) {
   gameState.setState({ shopItem: item });
