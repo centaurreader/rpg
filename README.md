@@ -92,5 +92,11 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
   - [x] orc stronghold too strong
 
 ### v1.2
-- [ ] go to inventory from shop
-- [ ] drill into inventory infinitely
+- [ ] trigger attack with spacebar
+- [ ] go to inventory from shop (to allow selling)
+- [ ] sell from unequipped list
+- [ ] make accuracy reduce damage amount instead of completely missing
+  - [ ] move misses back to being a random slim chance
+  - [ ] always hit after 2 consecutive misses
+- [ ] add 1x heal; gain 1 each new area
+- [ ] add permanent upgrades for purchase on death (roguelite ish)
