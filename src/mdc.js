@@ -1231,7 +1231,7 @@ gameMenuButtonEl.addEventListener('click', () => {
   gameMenuModalEl.classList.remove('modal-visible');
   gameMenuTitleEl.innerText = 'Murder Death Click';
   gameMenuDescriptionEl.innerText = 'Murder Orcs. Get Loot. Level Up.';
-  window.focus();
+  attackButtonEl.focus();
 });
 gameMenuContinueButtonEl.addEventListener('click', () => {
   gameMenuModalEl.classList.remove('modal-visible');
