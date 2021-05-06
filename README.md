@@ -102,17 +102,31 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [x] add width and height to all images
 - [x] defer css loading for custom font
 - [x] include meta description
+- [x] make toolbar list items valid html
 - [ ] add permanent upgrades for purchase on death (roguelite ish)
-  - [ ] Alchemist: gain health pot when you go to an area
   - [ ] Drain: 1% life steal on hit
+    - [ ] check for drain in tick and apply based on damage done
   - [ ] Overpower: critical hit chance
+    - [ ] check in roll damage
+    - [ ] different hit indicator
   - [ ] Cleave: chance to strike twice
+    - [ ] check for buff in rollDamage
+    - [ ] different hit indicator
   - [ ] Scavenger: chance to drop loot
+    - [ ] check in lootProc
   - [ ] Refined: chance to drop higher quality loot
+    - [ ] check in lootProc
   - [ ] Nimble: +20 dodge
+    - [ ] check in init
   - [ ] Marksman: +20 accuracy
+    - [ ] check in init
+  - [ ] Alchemist: gain health pot when you go to an area
 - [ ] select buff on death
 - [ ] display buffs in character screen, on death
   - [ ] 0 gp on new game
   - [ ] only allow to buy one upgrade
-- [ ] start new game (reset buffs)
+- [ ] start new game w/ buffs
+- [ ] start new game w/o buffs (reset progress)
+- [ ] use game win modal as death modal (show stats, equip, etc)
+- [ ] tweet stats on win/death?
+- [ ] pwa compliance
