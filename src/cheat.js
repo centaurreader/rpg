@@ -6,6 +6,7 @@ const cheatCloseEl = document.getElementById('cheat_close');
 const lifeDrainEl = document.getElementById('cheat_drain');
 const nimbleEl = document.getElementById('cheat_nimble');
 const marksmanEl = document.getElementById('cheat_marksman');
+const refinedEl = document.getElementById('cheat_refined');
 const scavengerEl = document.getElementById('cheat_scavenger');
 
 let press = 0;
@@ -20,8 +21,10 @@ document.addEventListener('keydown', (e) => {
   if (press === 5) {
     /* init upgrades */
     lifeDrainEl.checked = hasUpgrade('Drain');
-    nimbleEl.checked = hasUpgrade('Nimble');
     marksmanEl.checked = hasUpgrade('Marksman');
+    nimbleEl.checked = hasUpgrade('Nimble');
+    refinedEl.checked = hasUpgrade('Refined');
+    scavengerEl.checked = hasUpgrade('Scavenger');
     
     /* open modal */
     cheatModalEl.classList.add('modal-visible');
@@ -40,6 +43,9 @@ marksmanEl.addEventListener('click', (event) => {
 });
 nimbleEl.addEventListener('click', (event) => {
   applyUpgrade(getUpgradeFromTable('Nimble'), nimbleEl.checked);
+});
+refinedEl.addEventListener('click', () => {
+  applyUpgrade(getUpgradeFromTable('Refined'), refinedEl.checked);
 });
 scavengerEl.addEventListener('click', () => {
   applyUpgrade(getUpgradeFromTable('Scavenger'), scavengerEl.checked);

@@ -91,7 +91,7 @@ const upgradeTable = [
   { name: 'Overpower', description: '+10% critical hit chance', stats: [ { name: 'Crit Chance', value: .2 } ] },
   { name: 'Cleave', description: 'Gain a chance to deal 2x damage on hit', stats: [ { name: 'Attack Multiplier', value: 2 } ] },
   { name: 'Scavenger', description: '+10% chance to drop loot on enemy death', stats: [ { name: 'Loot Find', value: 0.1 } ] },
-  { name: 'Refined', description: '+10% chance to drop higher quality loot on enemy death', stats: [ { name: 'Loot Quality', value: 0.1 } ] },
+  { name: 'Refined', description: 'Increase dropped loot quality by 30%', stats: [ { name: 'Loot Quality', value: 0.3 } ] },
   { name: 'Nimble', description: '+20 base dodge', stats: [ { name: 'Dodge', value: 20 } ] },
   { name: 'Marksman', description: '+20 base accuracy', stats: [ { name: 'Accuracy', value: 20 } ] },
 ];
@@ -244,7 +244,12 @@ const shouldLoot = () => {
 };
 const rollLootLevel = () => {
   const { level } = gameState.getState();
-  const min = Math.abs(level - 5);
+  const refinedUpgrade = getUpgrade('Refined');
+  let minAmount = 5;
+  if (refinedUpgrade) {
+    minAmount = minAmount - Math.ceil(minAmount * refinedUpgrade.stats.find((s) => s.name === 'Loot Quality').value);
+  }
+  const min = Math.abs(level - minAmount);
   const max = level + 2;
   return Math.ceil(Math.pow(Math.random(), 3) * (max - min) + min);
 };

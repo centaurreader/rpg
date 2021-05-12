@@ -123,8 +123,8 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
     - [x] add method for proc and always use to access
   - [x] Scavenger: increase chance to drop loot
     - [x] check in lootProc
-  - [ ] Refined: chance to drop higher quality loot
-    - [ ] check in lootProc
+  - [x] Refined: chance to drop higher quality loot
+    - [x] check in lootProc
   - [ ] Overpower: critical hit chance
     - [ ] check in roll damage
     - [ ] different hit indicator
