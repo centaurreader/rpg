@@ -173,6 +173,10 @@ const enemyTable = [
     { name: 'Orc', modifier: 2, },
   ],
 ];
+const getUpgrade = (name) => {
+  const { upgrades } = gameState.getState();
+  return upgrades.find((upgrade) => upgrade.name === name);
+};
 const getEnemyLevelForPlayerLevel = (level) => {
   const diff = Math.floor(Math.random() * 4);
   return Math.abs(diff >= 2 ? level + Math.ceil(diff / 2) : level - diff);
@@ -415,13 +419,21 @@ const calcWounds = (damage) => {
   return calcDamage > 0 ? Math.ceil(calcDamage) : 0;
 };
 const reduceEnemyHp = (damage) => {
-  const { enemy } = gameState.getState();
-  const newHp = enemy.hp - damage;
+  const { enemy, wounds } = gameState.getState();
+  let damageProc = damage;
+  const drainUpgrade = getUpgrade('Drain');
+  let healAmount = 0;
+  if (damage > 0 && drainUpgrade) {
+    const drainUpgradeStat = drainUpgrade.stats.find((stat) => stat.name === 'Life Drain');
+    healAmount = Math.ceil(enemy.hp * drainUpgradeStat.value);
+  }
+  const newHp = enemy.hp - damageProc;
   gameState.setState({
     enemy: {
       ...enemy,
       hp: newHp <= 0 ? 0 : newHp,
     },
+    wounds: wounds - healAmount > 0 ? wounds - healAmount : 0,
   });
   save();
 };

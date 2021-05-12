@@ -115,8 +115,8 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [x] include meta description
 - [x] make toolbar list items valid html
 - [ ] add permanent upgrades for purchase on death (roguelite ish)
-  - [ ] Drain: 1% life steal on hit
-    - [ ] check for drain in tick and apply based on damage done
+  - [x] Drain: 1% life steal on hit
+    - [x] check for drain in tick and apply based on damage done
   - [ ] Overpower: critical hit chance
     - [ ] check in roll damage
     - [ ] different hit indicator
