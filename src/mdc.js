@@ -452,6 +452,7 @@ const reduceEnemyHp = (damage) => {
   if (damage > 0 && drainUpgrade) {
     const drainUpgradeStat = drainUpgrade.stats.find((stat) => stat.name === 'Life Drain');
     healAmount = Math.ceil(enemy.hp * drainUpgradeStat.value);
+    damageProc = damage + healAmount;
   }
   const newHp = enemy.hp - damageProc;
   gameState.setState({
