@@ -1,0 +1,22 @@
+{
+  "short_name": "MDC",
+  "name": "Murder Death Click",
+  "icons": [
+    {
+      "src": "/favicons/favicon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/favicons/favicon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/?source=pwa",
+  "background_color": "#2f2c2c",
+  "display": "minimal-ui",
+  "scope": "/",
+  "theme_color": "#f6e8e8",
+  "description": "an RPG by centaurreader"
+}

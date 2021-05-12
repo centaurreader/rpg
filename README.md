@@ -2,6 +2,17 @@
 
 RPG gameplay distilled to its purest essence. [Play the game](https://centaurreader.com/rpg).
 
+## Dev Env
+- Run `npm start`
+- App is now available at http://localhost:3000 (note: app is served from `./src`)
+
+## Build Production
+- Run `npm run build`
+- Rename `./dist/mdc.js` to `./dist/mdc.[version number].js`
+- Rename `./dist/css/style.css` to `./dist/style.[version number].css`
+- Update imports in `./dist/index.html` with the new file names
+- Update displayed version in `./dist/index.html`
+
 ## TODO
 ### v1
 - [x] Save
@@ -130,3 +141,6 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [ ] use game win modal as death modal (show stats, equip, etc)
 - [ ] tweet stats on win/death?
 - [ ] pwa compliance
+  - [x] add manifest, sw
+  - [ ] test deployed and installed cache changing
+- [ ] (bug) space bar triggers attack while in modals

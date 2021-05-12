@@ -7,7 +7,8 @@
     "build:cheat": "esbuild ./src/cheat.js --bundle --outfile=dist/cheat.js --minify",
     "build:clean": "shx rm -rf ./dist",
     "build:static": "shx mkdir -p ./dist && shx cp -r ./src/* ./dist/",
-    "build": "npm run build:clean && npm run build:static && npm run build:game && npm run build:cheat"
+    "build": "npm run build:clean && npm run build:static && npm run build:game && npm run build:cheat",
+    "start": "node ./test-server/server.js"
   },
   "repository": {
     "type": "git",

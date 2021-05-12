@@ -3,6 +3,19 @@
   BEGIN GAME
   \\\\\\\\\\
 */
+// pwa
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/service-worker.js', {
+      scope: '.'
+    }).then((reg) => {
+      console.log(reg.scope);
+    }).catch((err) => {
+      console.log(err);
+    });
+  });
+}
+
 // util
 function debounce(func, delay) {
   let timer;
