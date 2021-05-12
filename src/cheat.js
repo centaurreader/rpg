@@ -6,6 +6,7 @@ const cheatCloseEl = document.getElementById('cheat_close');
 const lifeDrainEl = document.getElementById('cheat_drain');
 const nimbleEl = document.getElementById('cheat_nimble');
 const marksmanEl = document.getElementById('cheat_marksman');
+const scavengerEl = document.getElementById('cheat_scavenger');
 
 let press = 0;
 
@@ -34,11 +35,14 @@ cheatHpI.addEventListener('blur', (e) => applyCheat('hp', e.target.value));
 lifeDrainEl.addEventListener('click', (event) => {
   applyUpgrade(getUpgradeFromTable('Drain'), lifeDrainEl.checked);
 });
+marksmanEl.addEventListener('click', (event) => {
+  applyUpgrade(getUpgradeFromTable('Marksman'), marksmanEl.checked);
+});
 nimbleEl.addEventListener('click', (event) => {
   applyUpgrade(getUpgradeFromTable('Nimble'), nimbleEl.checked);
 });
-marksmanEl.addEventListener('click', (event) => {
-  applyUpgrade(getUpgradeFromTable('Marksman'), marksmanEl.checked);
+scavengerEl.addEventListener('click', () => {
+  applyUpgrade(getUpgradeFromTable('Scavenger'), scavengerEl.checked);
 });
 
 function getUpgradeFromTable(name) {

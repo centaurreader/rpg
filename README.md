@@ -121,21 +121,20 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
     - [x] add method for proc and always use to access
   - [x] Marksman: +20 accuracy
     - [x] add method for proc and always use to access
+  - [x] Scavenger: increase chance to drop loot
+    - [x] check in lootProc
+  - [ ] Refined: chance to drop higher quality loot
+    - [ ] check in lootProc
   - [ ] Overpower: critical hit chance
     - [ ] check in roll damage
     - [ ] different hit indicator
   - [ ] Cleave: chance to strike twice
     - [ ] check for buff in rollDamage
     - [ ] different hit indicator
-  - [ ] Scavenger: chance to drop loot
-    - [ ] check in lootProc
-  - [ ] Refined: chance to drop higher quality loot
-    - [ ] check in lootProc
   - [ ] Alchemist: gain health pot when you go to an area
 - [ ] select buff on death
-- [ ] display buffs in character screen, on death
-  - [ ] 0 gp on new game
   - [ ] only allow to buy one upgrade
+- [ ] display buffs in character screen, on death
 - [ ] start new game w/ buffs
 - [ ] start new game w/o buffs (reset progress)
 - [ ] use game win modal as death modal (show stats, equip, etc)

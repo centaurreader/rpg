@@ -232,9 +232,14 @@ const calcLevel = () => {
   });
 };
 const shouldLoot = () => {
+  const scavengerUpgrade = { stats: [ { name: 'Loot Find', value: 0.1 } ] };
+  let skewAmount = .6;
+  if (scavengerUpgrade) {
+    skewAmount = skewAmount - scavengerUpgrade.stats.find((s) => s.name === 'Loot Find').value;
+  }
   const limit = 10000;
   const rng = Math.ceil(Math.random() * limit);
-  const skewed = rng / .6;
+  const skewed = rng / skewAmount;
   return skewed > limit;
 };
 const rollLootLevel = () => {
