@@ -127,17 +127,17 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
     - [x] check in lootProc
   - [ ] Overpower: critical hit chance
     - [ ] check in roll damage
-    - [ ] different hit indicator
+    - [x] different hit indicator
   - [ ] Cleave: chance to strike twice
     - [ ] check for buff in rollDamage
     - [ ] different hit indicator
   - [ ] Alchemist: gain health pot when you go to an area
-- [ ] display upgrades in character screen, on death
+- [ ] display upgrades in character screen
+- [ ] use game win modal as death modal (show stats, equip, upgrades, etc)
 - [ ] buy upgrade on death
   - [ ] only allow to buy one upgrade
 - [ ] start new game w/ upgrades
 - [ ] start new game w/o upgrades (reset progress)
-- [ ] use game win modal as death modal (show stats, equip, etc)
 - [ ] tweet stats on win/death?
 - [ ] pwa compliance
   - [x] add manifest, sw
