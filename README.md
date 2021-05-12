@@ -132,11 +132,11 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
     - [ ] check for buff in rollDamage
     - [ ] different hit indicator
   - [ ] Alchemist: gain health pot when you go to an area
-- [ ] select buff on death
+- [ ] display upgrades in character screen, on death
+- [ ] buy upgrade on death
   - [ ] only allow to buy one upgrade
-- [ ] display buffs in character screen, on death
-- [ ] start new game w/ buffs
-- [ ] start new game w/o buffs (reset progress)
+- [ ] start new game w/ upgrades
+- [ ] start new game w/o upgrades (reset progress)
 - [ ] use game win modal as death modal (show stats, equip, etc)
 - [ ] tweet stats on win/death?
 - [ ] pwa compliance
