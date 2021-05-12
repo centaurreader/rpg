@@ -54,8 +54,10 @@ function State() {
 }
 const gameState = new State();
 const SAVE_KEY = 'rpg-state';
+const SAVED_UPGRADES_KEY = 'rpg-upgrades';
 function save() {
   localStorage.setItem(SAVE_KEY, JSON.stringify(gameState.getState()));
+  localStorage.setItem(SAVED_UPGRADES_KEY, JSON.stringify(gameState.getState().upgrades));
 }
 function validateGameData(data) {
   const tempState = new State();
@@ -67,7 +69,12 @@ function validateGameData(data) {
 }
 function load() {
   try {
-    gameState.setState(validateGameData(JSON.parse(localStorage.getItem(SAVE_KEY))));
+    const upgrades = JSON.parse(localStorage.getItem(SAVED_UPGRADES_KEY));
+    const savedState = JSON.parse(localStorage.getItem(SAVE_KEY));
+    gameState.setState(validateGameData({
+      ...(savedState || {}),
+      upgrades: upgrades || [],
+    }));
     if (!gameState.getState().enemy) {
       genEnemy();
     }
@@ -333,17 +340,21 @@ const getAccuracyRating = () => {
   const equippedWeapons = inventory.filter((item) => item.equipped && item.equipped.includes('HAND') && item.statType === 'Damage');
   const isUnarmed = equippedWeapons.length === 0;
   const isDualWielding = equippedWeapons.length === 2;
+  const marksmanUpgrade = getUpgrade('Marksman');
   let accuracyRating = equippedWeapons.reduce((sum, curr) => {
     const { value } = curr.type.stats ? curr.type.stats.find((stat) => stat.name === 'Accuracy') : { value: 75 };
     return sum + value;
   }, 0);
+  if (marksmanUpgrade) {
+    accuracyRating = accuracyRating + marksmanUpgrade.stats.find((s) => s.name === 'Accuracy').value;
+  }
   if (isUnarmed) {
     return 100;
   }
   if (isDualWielding) {
     accuracyRating = (accuracyRating * .8) / 2;
   }
-  return accuracyRating;
+  return accuracyRating > 100 ? 100 : accuracyRating;
 };
 const shouldHit = () => {
   const accuracyRating = getAccuracyRating();
@@ -378,10 +389,15 @@ const rollDamage = () => {
 const getDodgeRating = () => {
   const { inventory } = gameState.getState();
   const equippedArmor = inventory.filter((item) => item.equipped && item.statType === 'Armor');
-  return equippedArmor.reduce((sum, curr) => {
+  const nimbleUpgrade = getUpgrade('Nimble');
+  let dodgeRating = equippedArmor.reduce((sum, curr) => {
     const { value } = curr.type.stats ? curr.type.stats.find((stat) => stat.name === 'Dodge') : { value: 0 };
     return sum + value;
   }, 0);
+  if (nimbleUpgrade) {
+    dodgeRating = dodgeRating + nimbleUpgrade.stats.find((s) => s.name === 'Dodge').value;
+  }
+  return dodgeRating > 100 ? 100 : dodgeRating;
 };
 const shouldDodge = () => {
   const dodgeRating = getDodgeRating();

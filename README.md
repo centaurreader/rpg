@@ -117,6 +117,10 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [ ] add permanent upgrades for purchase on death (roguelite ish)
   - [x] Drain: 1% life steal on hit
     - [x] check for drain in tick and apply based on damage done
+  - [x] Nimble: +20 dodge
+    - [x] add method for proc and always use to access
+  - [x] Marksman: +20 accuracy
+    - [x] add method for proc and always use to access
   - [ ] Overpower: critical hit chance
     - [ ] check in roll damage
     - [ ] different hit indicator
@@ -127,10 +131,6 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
     - [ ] check in lootProc
   - [ ] Refined: chance to drop higher quality loot
     - [ ] check in lootProc
-  - [ ] Nimble: +20 dodge
-    - [ ] check in init
-  - [ ] Marksman: +20 accuracy
-    - [ ] check in init
   - [ ] Alchemist: gain health pot when you go to an area
 - [ ] select buff on death
 - [ ] display buffs in character screen, on death

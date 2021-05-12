@@ -4,6 +4,8 @@ const cheatLevelI = document.getElementById('cheat_level');
 const cheatHpI = document.getElementById('cheat_hp');
 const cheatCloseEl = document.getElementById('cheat_close');
 const lifeDrainEl = document.getElementById('cheat_drain');
+const nimbleEl = document.getElementById('cheat_nimble');
+const marksmanEl = document.getElementById('cheat_marksman');
 
 let press = 0;
 
@@ -17,6 +19,9 @@ document.addEventListener('keydown', (e) => {
   if (press === 5) {
     /* init upgrades */
     lifeDrainEl.checked = hasUpgrade('Drain');
+    nimbleEl.checked = hasUpgrade('Nimble');
+    marksmanEl.checked = hasUpgrade('Marksman');
+    
     /* open modal */
     cheatModalEl.classList.add('modal-visible');
   }
@@ -28,6 +33,12 @@ cheatHpI.addEventListener('blur', (e) => applyCheat('hp', e.target.value));
 
 lifeDrainEl.addEventListener('click', (event) => {
   applyUpgrade(getUpgradeFromTable('Drain'), lifeDrainEl.checked);
+});
+nimbleEl.addEventListener('click', (event) => {
+  applyUpgrade(getUpgradeFromTable('Nimble'), nimbleEl.checked);
+});
+marksmanEl.addEventListener('click', (event) => {
+  applyUpgrade(getUpgradeFromTable('Marksman'), marksmanEl.checked);
 });
 
 function getUpgradeFromTable(name) {
@@ -51,7 +62,7 @@ function applyUpgrade(upgrade, shouldAdd) {
     }
   } else {
     gameState.setState({
-      upgrades: upgrades.filter((u) => u.name === upgrade.name),
+      upgrades: upgrades.filter((u) => u.name !== upgrade.name),
     });
   }
 }
