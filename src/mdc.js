@@ -87,11 +87,11 @@ function load() {
 // engine
 const upgradeTable = [
   { name: 'Alchemist', description: 'Gain one health potion for each area you visit', stats: [ { name: 'Potions', value: 1 } ] },
-  { name: 'Cleave', description: 'Gain a chance to deal 2x damage on hit', stats: [ { name: 'Attack Multiplier', value: 2 } ] },
+  { name: 'Cleave', description: 'Gain a chance to deal 2x damage on hit', stats: [ { name: 'Chance', value: .2 }, { name: 'Multiplier', value: 2 } ] },
   { name: 'Drain', description: 'Steal 1% of enemy life on hit', stats: [ { name: 'Life Drain', value: .01 } ] },
   { name: 'Marksman', description: '+20 base accuracy', stats: [ { name: 'Accuracy', value: 20 } ] },
   { name: 'Nimble', description: '+20 base dodge', stats: [ { name: 'Dodge', value: 20 } ] },
-  { name: 'Overpower', description: '+10% critical hit chance', stats: [ { name: 'Crit Chance', value: .2 } ] },
+  { name: 'Overpower', description: '+10% critical hit chance', stats: [ { name: 'Multiplier', value: 1.25, }, { name: 'Chance', value: .2 } ] },
   { name: 'Refined', description: 'Increase dropped loot quality by 30%', stats: [ { name: 'Loot Quality', value: 0.3 } ] },
   { name: 'Scavenger', description: '+10% chance to drop loot on enemy death', stats: [ { name: 'Loot Find', value: 0.1 } ] },
 ];
@@ -389,10 +389,15 @@ const shouldHit = () => {
 };
 const shouldOverpower = () => {
   const overpowerUpgrade = getUpgrade('Overpower');
-  const willOverpower = overpowerUpgrade
-    ? Math.random() < overpowerUpgrade.stats.find(s => s.name === 'Crit Chance').value
+  return overpowerUpgrade
+    ? Math.random() < overpowerUpgrade.stats.find(s => s.name === 'Chance').value
     : false;
-  return willOverpower;
+};
+const shouldCleave = () => {
+  const cleaveUpgrade = getUpgrade('Cleave');
+  return cleaveUpgrade
+    ? Math.random() < cleaveUpgrade.stats.find(s => s.name === 'Chance').value
+    : false;
 };
 const getDamage = (damageMultiplier = 1) => {
   const { damage, inventory, level } = gameState.getState();
@@ -401,7 +406,7 @@ const getDamage = (damageMultiplier = 1) => {
   return damageProc * damageMultiplier;
 };
 const rollDamage = (damageMultiplier) => {
-  const calculatedDamage = getDamage(damageMultiplier);
+  const calculatedDamage = Math.ceil(getDamage(damageMultiplier));
   return shouldHit() ? calculatedDamage : 0;
 };
 const getDodgeRating = () => {
@@ -522,12 +527,21 @@ function tick() {
   }
   attack.setAttribute('style', 'visibility: hidden');
 
+  const willCleave = shouldCleave();
+  const cleaveUpgrade = getUpgrade('Cleave');
+  const cleaveMultiplier = willCleave ? cleaveUpgrade.stats.find(s => s.name === 'Multiplier').value : 0;
+
   const willOverpower = shouldOverpower();
-  const damageDone = rollDamage(willOverpower ? 1.25 : 1);
-  const wounds = calcWounds(rollEnemyDamage(gameState.getState().enemy));
-  if (wounds > 0) {
-    showWound(`-${wounds}`);
-    gameState.setState({ wounds: gameState.getState().wounds + wounds });
+  const overpowerUpgrade = getUpgrade('Overpower');
+  const overpowerMultiplier = willOverpower ? overpowerUpgrade.stats.find(s => s.name === 'Multiplier').value : 0;
+
+  const dmgMultiplier = overpowerMultiplier + cleaveMultiplier;
+  const damageDone = rollDamage(dmgMultiplier === 0 ? 1 : dmgMultiplier);
+
+  console.log(willCleave);
+  if (willCleave) {
+    cleaveEl.setAttribute('style', 'visibility: visible');
+    setTimeout(() => { cleaveEl.setAttribute('style', 'visibility: hidden'); }, 500);
   }
   if (willOverpower) {
     critEl.setAttribute('style', 'visibility: visible');
@@ -537,7 +551,9 @@ function tick() {
     missEl.setAttribute('style', 'visibility: visible');
     setTimeout(() => { missEl.setAttribute('style', 'visibility: hidden'); }, 500);
   }
+
   reduceEnemyHp(damageDone);
+
   if (gameState.getState().enemy.hp <= 0) {
     enemyHpStatusEl.setAttribute('style', 'width: 0');
     setTimeout(() => {
@@ -570,6 +586,11 @@ function tick() {
     save();
   }
 
+  const wounds = calcWounds(rollEnemyDamage(gameState.getState().enemy));
+  if (wounds > 0) {
+    showWound(`-${wounds}`);
+    gameState.setState({ wounds: gameState.getState().wounds + wounds });
+  }
   if (gameState.getState().wounds >= gameState.getState().hp) {
     attackButtonEl.disabled = true;
     setTimeout(() => {
@@ -606,6 +627,7 @@ const enemyHpStatusEl = document.getElementById('enemy_hp_status');
 const hitEl = document.getElementById('attack');
 const missEl = document.getElementById('miss');
 const critEl = document.getElementById('crit');
+const cleaveEl = document.getElementById('cleave');
 const attackButtonEl = document.getElementById('attack_action');
 const lootDropEl = document.getElementById('loot');
 // character
