@@ -538,7 +538,6 @@ function tick() {
   const dmgMultiplier = overpowerMultiplier + cleaveMultiplier;
   const damageDone = rollDamage(dmgMultiplier === 0 ? 1 : dmgMultiplier);
 
-  console.log(willCleave);
   if (willCleave) {
     cleaveEl.setAttribute('style', 'visibility: visible');
     setTimeout(() => { cleaveEl.setAttribute('style', 'visibility: hidden'); }, 500);
