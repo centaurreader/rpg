@@ -125,11 +125,11 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
     - [x] check in lootProc
   - [x] Refined: chance to drop higher quality loot
     - [x] check in lootProc
-  - [ ] Overpower: critical hit chance
-    - [ ] check in roll damage
+  - [x] Overpower: critical hit chance
+    - [x] check in get damage
     - [x] different hit indicator
   - [ ] Cleave: chance to strike twice
-    - [ ] check for buff in rollDamage
+    - [ ] check for buff in rollDamage (this should apply hit twice, including drain, etc.)
     - [ ] different hit indicator
   - [ ] Alchemist: gain health pot when you go to an area
 - [ ] display upgrades in character screen

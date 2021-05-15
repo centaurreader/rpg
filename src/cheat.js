@@ -4,8 +4,9 @@ const cheatLevelI = document.getElementById('cheat_level');
 const cheatHpI = document.getElementById('cheat_hp');
 const cheatCloseEl = document.getElementById('cheat_close');
 const lifeDrainEl = document.getElementById('cheat_drain');
-const nimbleEl = document.getElementById('cheat_nimble');
 const marksmanEl = document.getElementById('cheat_marksman');
+const nimbleEl = document.getElementById('cheat_nimble');
+const overpowerEl = document.getElementById('cheat_overpower');
 const refinedEl = document.getElementById('cheat_refined');
 const scavengerEl = document.getElementById('cheat_scavenger');
 
@@ -23,6 +24,7 @@ document.addEventListener('keydown', (e) => {
     lifeDrainEl.checked = hasUpgrade('Drain');
     marksmanEl.checked = hasUpgrade('Marksman');
     nimbleEl.checked = hasUpgrade('Nimble');
+    overpowerEl.checked = hasUpgrade('Overpower');
     refinedEl.checked = hasUpgrade('Refined');
     scavengerEl.checked = hasUpgrade('Scavenger');
     
@@ -43,6 +45,9 @@ marksmanEl.addEventListener('click', (event) => {
 });
 nimbleEl.addEventListener('click', (event) => {
   applyUpgrade(getUpgradeFromTable('Nimble'), nimbleEl.checked);
+});
+overpowerEl.addEventListener('click', () => {
+  applyUpgrade(getUpgradeFromTable('Overpower'), overpowerEl.checked);
 });
 refinedEl.addEventListener('click', () => {
   applyUpgrade(getUpgradeFromTable('Refined'), refinedEl.checked);

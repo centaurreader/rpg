@@ -87,13 +87,13 @@ function load() {
 // engine
 const upgradeTable = [
   { name: 'Alchemist', description: 'Gain one health potion for each area you visit', stats: [ { name: 'Potions', value: 1 } ] },
-  { name: 'Drain', description: 'Steal 1% of enemy life on hit', stats: [ { name: 'Life Drain', value: .01 } ] },
-  { name: 'Overpower', description: '+10% critical hit chance', stats: [ { name: 'Crit Chance', value: .2 } ] },
   { name: 'Cleave', description: 'Gain a chance to deal 2x damage on hit', stats: [ { name: 'Attack Multiplier', value: 2 } ] },
-  { name: 'Scavenger', description: '+10% chance to drop loot on enemy death', stats: [ { name: 'Loot Find', value: 0.1 } ] },
-  { name: 'Refined', description: 'Increase dropped loot quality by 30%', stats: [ { name: 'Loot Quality', value: 0.3 } ] },
-  { name: 'Nimble', description: '+20 base dodge', stats: [ { name: 'Dodge', value: 20 } ] },
+  { name: 'Drain', description: 'Steal 1% of enemy life on hit', stats: [ { name: 'Life Drain', value: .01 } ] },
   { name: 'Marksman', description: '+20 base accuracy', stats: [ { name: 'Accuracy', value: 20 } ] },
+  { name: 'Nimble', description: '+20 base dodge', stats: [ { name: 'Dodge', value: 20 } ] },
+  { name: 'Overpower', description: '+10% critical hit chance', stats: [ { name: 'Crit Chance', value: .2 } ] },
+  { name: 'Refined', description: 'Increase dropped loot quality by 30%', stats: [ { name: 'Loot Quality', value: 0.3 } ] },
+  { name: 'Scavenger', description: '+10% chance to drop loot on enemy death', stats: [ { name: 'Loot Find', value: 0.1 } ] },
 ];
 const equipmentSlots = [
   { key: 'HEAD', value: 'Head', },
@@ -387,13 +387,21 @@ const shouldHit = () => {
   }
   return willHit;
 };
-const getDamage = () => {
+const shouldOverpower = () => {
+  const overpowerUpgrade = getUpgrade('Overpower');
+  const willOverpower = overpowerUpgrade
+    ? Math.random() < overpowerUpgrade.stats.find(s => s.name === 'Crit Chance').value
+    : false;
+  return willOverpower;
+};
+const getDamage = (damageMultiplier = 1) => {
   const { damage, inventory, level } = gameState.getState();
   const arms = inventory.filter((item) => (item.equipped || '').includes('HAND') && item.statType === 'Damage');
-  return (damage * level) + arms.reduce((total, item) => item.power + total, 0);
+  const damageProc = (damage * level) + arms.reduce((total, item) => item.power + total, 0);
+  return damageProc * damageMultiplier;
 };
-const rollDamage = () => {
-  const calculatedDamage = getDamage();
+const rollDamage = (damageMultiplier) => {
+  const calculatedDamage = getDamage(damageMultiplier);
   return shouldHit() ? calculatedDamage : 0;
 };
 const getDodgeRating = () => {
@@ -514,11 +522,16 @@ function tick() {
   }
   attack.setAttribute('style', 'visibility: hidden');
 
-  const damageDone = rollDamage();
+  const willOverpower = shouldOverpower();
+  const damageDone = rollDamage(willOverpower ? 1.25 : 1);
   const wounds = calcWounds(rollEnemyDamage(gameState.getState().enemy));
   if (wounds > 0) {
     showWound(`-${wounds}`);
     gameState.setState({ wounds: gameState.getState().wounds + wounds });
+  }
+  if (willOverpower) {
+    critEl.setAttribute('style', 'visibility: visible');
+    setTimeout(() => { critEl.setAttribute('style', 'visibility: hidden'); }, 500);
   }
   if (damageDone === 0) {
     missEl.setAttribute('style', 'visibility: visible');
@@ -592,6 +605,7 @@ const enemyHpEl = document.getElementById('enemy_hp');
 const enemyHpStatusEl = document.getElementById('enemy_hp_status');
 const hitEl = document.getElementById('attack');
 const missEl = document.getElementById('miss');
+const critEl = document.getElementById('crit');
 const attackButtonEl = document.getElementById('attack_action');
 const lootDropEl = document.getElementById('loot');
 // character
