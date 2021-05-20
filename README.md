@@ -131,7 +131,14 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
   - [x] Cleave: chance to strike twice
     - [x] check for buff in rollDamage (this should apply hit twice, including drain, etc.)
     - [x] different hit indicator
-  - [ ] Alchemist: gain health pot when you go to an area
+  - [x] Alchemist: gain health pot when you go to an area
+    - [x] conditionally display heal pot
+    - [x] track and display number of heals available
+    - [x] disable heal pot when no heals available
+    - [x] heal modal
+    - [x] increment heal count on new area
+    - [x] heal icon asset for navbar
+    - [x] heal image asset for modal
 - [ ] upgrade UI
   - [ ] display upgrades in character screen
   - [ ] use game win modal as death modal (show stats, equip, upgrades, etc)

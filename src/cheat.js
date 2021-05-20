@@ -3,6 +3,7 @@ const cheatXpI = document.getElementById('cheat_xp');
 const cheatLevelI = document.getElementById('cheat_level');
 const cheatHpI = document.getElementById('cheat_hp');
 const cheatCloseEl = document.getElementById('cheat_close');
+const alchemistCheatEl = document.getElementById('cheat_alchemist');
 const cleaveCheatEl = document.getElementById('cheat_cleave');
 const lifeDrainEl = document.getElementById('cheat_drain');
 const marksmanEl = document.getElementById('cheat_marksman');
@@ -22,6 +23,7 @@ document.addEventListener('keydown', (e) => {
   }
   if (press === 5) {
     /* init upgrades */
+    alchemistCheatEl.checked = hasUpgrade('Alchemist');
     cleaveCheatEl.checked = hasUpgrade('Cleave');
     lifeDrainEl.checked = hasUpgrade('Drain');
     marksmanEl.checked = hasUpgrade('Marksman');
@@ -39,6 +41,9 @@ cheatXpI.addEventListener('blur', (e) => applyCheat('xp', e.target.value));
 cheatLevelI.addEventListener('blur', (e) => applyCheat('level', e.target.value));
 cheatHpI.addEventListener('blur', (e) => applyCheat('hp', e.target.value));
 
+alchemistCheatEl.addEventListener('click', (event) => {
+  applyUpgrade(getUpgradeFromTable('Alchemist'), alchemistCheatEl.checked);
+});
 cleaveCheatEl.addEventListener('click', (event) => {
   applyUpgrade(getUpgradeFromTable('Cleave'), cleaveCheatEl.checked);
 });

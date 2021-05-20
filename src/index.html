@@ -55,6 +55,12 @@
         </li>
         <li>
           <div class="toolbar--item">
+            <a href="#" id="heal_button">
+              <img src="img/heal_pot.gif" alt="Inventory" height="32" width="32" />
+              <span class="toolbar--item_indicator">1</span>
+            </a>
+          </div>
+          <div class="toolbar--item">
             <a href="#" id="character_button">
               <img src="img/character-icon.gif" alt="Inventory" height="32" width="32" />
             </a>
@@ -153,6 +159,21 @@
       </div>
     </section>
 
+    <section id="heal_menu" class="modal">
+      <div class="modal_inner">
+        <h1 class="visually_hidden">Heal</h1>
+        <div class="container">
+          <div class="container_fill container_fill-center">
+            <img id="heal_menu_image" src="img/healing.gif" alt="" height="128" width="128" />
+            <p class="label-crunch label-large label-center">Are you sure you want to heal?</p>
+            <p id="heal_menu_qty" class="label-small label-center"></p>
+          </div>
+          <button id="use_heal_button" class="action_button action_button-hollow" type="button">Drink Potion</button>
+        </div>
+        <button id="heal_menu_close_button" class="action_button" type="button">Back</button>
+      </div>
+    </section>
+
     <section id="game_menu" class="modal modal-visible">
       <div class="modal_inner modal_inner-no_fill game_menu_background">
         <div class="container container-no_fill">
@@ -234,6 +255,7 @@
         <label>hp</label>
         <input type="number" id="cheat_hp" />
         <br />
+        <label><input type="checkbox" id="cheat_alchemist"> Alchemist</label>
         <label><input type="checkbox" id="cheat_cleave"> Cleave</label>
         <label><input type="checkbox" id="cheat_drain"> Life Drain</label>
         <label><input type="checkbox" id="cheat_marksman"> Marskman</label>

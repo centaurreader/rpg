@@ -43,6 +43,7 @@ function State() {
     killCount: 0,
     missCount: 0,
     upgrades: [],
+    heals: 0,
   };
   this.getState = () => state;
   this.setState = incoming => {
@@ -70,6 +71,7 @@ function validateGameData(data) {
 function load() {
   try {
     const upgrades = JSON.parse(localStorage.getItem(SAVED_UPGRADES_KEY));
+    const healUpgrade = getUpgrade('Alchemist');
     const savedState = JSON.parse(localStorage.getItem(SAVE_KEY));
     gameState.setState(validateGameData({
       ...(savedState || {}),
@@ -77,6 +79,9 @@ function load() {
     }));
     if (!gameState.getState().enemy) {
       genEnemy();
+      if (healUpgrade) {
+        gameState.setState({ heals: 1 });
+      }
     }
     updateUi(gameState.getState());
   } catch (err) {
@@ -202,7 +207,8 @@ const calcXp = () => {
   });
 };
 const calcLevel = () => {
-  const { xp, level, hp, wounds } = gameState.getState();
+  const { xp, level, hp, wounds, heals, } = gameState.getState();
+  const healUpgrade = getUpgrade('Alchemist');
   const shouldLevelUp = xp >= getXpForLevel(level);
   const hpIfLevelUp = 10 * ((level - 1) * (level + 2)) + 200;
   const woundsIfLevelUp = wounds - (hpIfLevelUp - hp) < 0 ? 0 : wounds - (hpIfLevelUp - hp);
@@ -213,6 +219,7 @@ const calcLevel = () => {
   const dinged = dinged10 || dinged24 || dinged44;
   if (dinged10 || dinged24 || dinged44) {
     gameState.setState({
+      heals: healUpgrade ? heals + 1 : heals,
       shopItems: equipmentSlots.map((slot) => {
         let slotName = slot.key;
         if (slotName.includes('HAND')) {
@@ -609,6 +616,7 @@ function tick() {
 */
 // main ui
 const titleIconEl = document.getElementById('title_icon');
+const healButtonEl = document.getElementById('heal_button');
 const characterButtonEl = document.getElementById('character_button');
 const inventoryButtonEl = document.getElementById('inventory_button');
 const inventoryIconEl = document.getElementById('inventory_icon');
@@ -647,6 +655,11 @@ const equippedItemsEl = document.getElementById('equipped_items');
 const unequippedInventoryEl = document.getElementById('unequipped_items');
 const inventoryDetailItemEl = document.getElementById('inventory_detail_item');
 const inventoryDetailActionsEl = document.getElementById('inventory_detail_actions');
+// heal menu
+const healModalEl = document.getElementById('heal_menu');
+const healMenuQtyEl = document.getElementById('heal_menu_qty');
+const useHealButtonEl = document.getElementById('use_heal_button');
+const healMenuCloseButtonEl = document.getElementById('heal_menu_close_button');
 // game menu
 const gameMenuModalEl = document.getElementById('game_menu');
 const gameMenuTitleEl = document.getElementById('game_menu_title');
@@ -1260,6 +1273,34 @@ const UI = {
       };
     })(),
   },
+  healButton: {
+    element: healButtonEl,
+    value: (el, state) => {
+      const healUpgrade = getUpgrade('Alchemist');
+      if (healUpgrade) {
+        el.style = '';
+        el.querySelector('.toolbar--item_indicator').innerText = state.heals.toString();
+        if (state.heals === 0) {
+          el.classList.add('toolbar--item-disabled');
+          el.querySelector('.toolbar--item_indicator').style = 'display: none;';
+          el.removeEventListener('click', openHealModal);
+        } else {
+          el.querySelector('.toolbar--item_indicator').style = '';
+          el.classList.remove('toolbar--item-disabled');
+          el.addEventListener('click', openHealModal);
+        }
+      } else {
+        el.style = 'display: none;';
+      }
+    },
+  },
+  healMenuQty: {
+    element: healMenuQtyEl,
+    value: (el, state) => {
+      const { heals } = state;
+      el.innerText = `${heals === 0 ? 'No' : heals} ${heals > 1 ? 'potions' : 'potion'} available`;
+    },
+  },
 };
 const sellItem = (itemToSell) => {
   gameState.setState({
@@ -1348,6 +1389,25 @@ document.addEventListener('keypress', debounce((e) => {
     tick();
   }
 }, 125));
+function openHealModal() {
+  healModalEl.classList.add('modal-visible');
+}
+useHealButtonEl.addEventListener('click', () => {
+  const { heals } = gameState.getState();
+  if (heals > 0) {
+    gameState.setState({
+      wounds: 0,
+      heals: heals - 1,
+    });
+    updateUi(gameState.getState());
+    save();
+    closeHealMenu();
+  }
+});
+function closeHealMenu() {
+  healModalEl.classList.remove('modal-visible');
+}
+healMenuCloseButtonEl.addEventListener('click', closeHealMenu);
 characterButtonEl.addEventListener('click', () => {
   characterModalEl.classList.add('modal-visible');
 });
