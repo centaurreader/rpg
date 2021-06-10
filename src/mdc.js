@@ -1113,6 +1113,28 @@ const UI = {
       gpStatEl.classList.add('label-small');
       gpStatEl.innerHTML = `${state.gp} gp`;
       el.appendChild(gpStatEl);
+
+      const upgradesLabelEl = document.createElement('p');
+      upgradesLabelEl.classList.add('label-small', 'inventory_category', 'upgrade_category');
+      upgradesLabelEl.innerText = 'Upgrades';
+      el.appendChild(upgradesLabelEl);
+
+      const upgradesEl = document.createElement('ul');
+      upgradesEl.classList.add('upgrade_list');
+      state.upgrades.forEach((upgrade) => {
+        const upgradeContainerEl = document.createElement('li');
+        upgradeContainerEl.classList.add('upgrade_list_item');
+        const upgradeNameEl = document.createElement('p');
+        upgradeNameEl.classList.add('label-medium');
+        upgradeNameEl.innerText = upgrade.name;
+        upgradeContainerEl.appendChild(upgradeNameEl);
+        const upgradeDescEl = document.createElement('p');
+        upgradeDescEl.classList.add('label-small');
+        upgradeDescEl.innerText = upgrade.description;
+        upgradeContainerEl.appendChild(upgradeDescEl);
+        upgradesEl.appendChild(upgradeContainerEl);
+      });
+      el.appendChild(upgradesEl);
     },
   },
   areaMenu: {

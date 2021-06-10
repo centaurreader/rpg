@@ -285,6 +285,7 @@ body {
   z-index: 1001;
 }
 .inventory_category {
+  text-align: left;
   background-color: #f6e8e8;
   color: #2f2c2c;
   font-size: 1rem;
@@ -357,6 +358,19 @@ body {
 .stat_list {
   text-align: center;
   margin-top: 1rem;
+}
+
+.upgrade_category {
+  width: 100%;
+  margin: 1.5rem 0 1rem;
+}
+.upgrade_list {
+  text-align: left;
+}
+.upgrade_list_item {
+  margin-bottom: .75rem;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid #f6e8e8;
 }
 
 .dialog {

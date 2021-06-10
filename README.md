@@ -114,7 +114,7 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [x] defer css loading for custom font
 - [x] include meta description
 - [x] make toolbar list items valid html
-- [ ] add permanent upgrades for purchase on death (roguelite ish)
+- [x] add permanent upgrades for purchase on death (roguelite ish)
   - [x] Drain: 1% life steal on hit
     - [x] check for drain in tick and apply based on damage done
   - [x] Nimble: +20 dodge
@@ -140,13 +140,12 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
     - [x] heal icon asset for navbar
     - [x] heal image asset for modal
 - [ ] upgrade UI
-  - [ ] display upgrades in character screen
+  - [x] display upgrades in character screen
   - [ ] use game win modal as death modal (show stats, equip, upgrades, etc)
   - [ ] buy upgrade on death
     - [ ] only allow to buy one upgrade
   - [ ] start new game w/ upgrades
   - [ ] start new game w/o upgrades (reset progress)
-- [ ] tweet stats on win/death?
 - [ ] pwa compliance
   - [x] add manifest, sw
   - [ ] test deployed and installed cache changing
