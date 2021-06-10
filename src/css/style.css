@@ -360,6 +360,7 @@ body {
   margin-top: 1rem;
 }
 
+.character_image { margin: 0 auto; }
 .upgrade_category {
   width: 100%;
   margin: 1.5rem 0 1rem;

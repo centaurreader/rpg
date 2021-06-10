@@ -1121,6 +1121,12 @@ const UI = {
 
       const upgradesEl = document.createElement('ul');
       upgradesEl.classList.add('upgrade_list');
+      if (!state.upgrades.length) {
+        const emptyUpgradesEl = document.createElement('p');
+        emptyUpgradesEl.classList.add('label-small');
+        emptyUpgradesEl.innerText = 'None';
+        upgradesEl.appendChild(emptyUpgradesEl);
+      }
       state.upgrades.forEach((upgrade) => {
         const upgradeContainerEl = document.createElement('li');
         upgradeContainerEl.classList.add('upgrade_list_item');
