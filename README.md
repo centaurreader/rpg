@@ -144,8 +144,11 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
   - [ ] use game win modal as death modal (show stats, equip, upgrades, etc)
   - [ ] buy upgrade on death
     - [ ] only allow to buy one upgrade
-  - [ ] start new game w/ upgrades
-  - [ ] start new game w/o upgrades (reset progress)
+    - [ ] end and go back to title screen
+  - [ ] new game screens
+    - [ ] start new character
+    - [ ] continue existing character
+    - [ ] delete character
 - [ ] pwa compliance
   - [x] add manifest, sw
   - [ ] test deployed and installed cache changing
