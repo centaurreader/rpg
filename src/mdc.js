@@ -3,19 +3,6 @@
   BEGIN GAME
   \\\\\\\\\\
 */
-// pwa
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/service-worker.js', {
-      scope: '.'
-    }).then((reg) => {
-      console.log(reg.scope);
-    }).catch((err) => {
-      console.log(err);
-    });
-  });
-}
-
 // util
 function debounce(func, delay) {
   let timer;
@@ -24,7 +11,6 @@ function debounce(func, delay) {
     timer = setTimeout(() => func(...args), delay);
   };
 }
-
 // state
 function State() {
   let state = {
@@ -44,6 +30,10 @@ function State() {
     missCount: 0,
     upgrades: [],
     heals: 0,
+    characters: [],
+    hasDied: false,
+    hasWon: false,
+    characterId: crypto.getRandomValues(new Uint32Array(4)).join('-'),
   };
   this.getState = () => state;
   this.setState = incoming => {
@@ -55,10 +45,57 @@ function State() {
 }
 const gameState = new State();
 const SAVE_KEY = 'rpg-state';
-const SAVED_UPGRADES_KEY = 'rpg-upgrades';
+const SAVED_CHARACTERS = 'rpg-characters';
+function serializeCharacterFromState() {
+  const state = gameState.getState();
+  return {
+    xp: state.xp,
+    gp: state.gp,
+    hp: state.hp,
+    wounds: state.hasDied ? 0 : state.wounds,
+    level: state.level,
+    inventory: state.inventory,
+    enemy: state.hasDied ? null : state.enemy,
+    killCount: state.killCount,
+    upgrades: state.upgrades,
+    heals: state.heals,
+    hasDied: true,
+    hasWon: state.hasWon,
+    characterId: state.characterId,
+  };
+}
+function hydrateGameStateFromCharacter(character) {
+  return {
+    xp: character.xp,
+    gp: character.gp,
+    hp: character.hp,
+    wounds: character.wounds,
+    damage: character.damage,
+    level: character.level,
+    inventory: character.inventory,
+    enemy: character.enemy,
+    killCount: character.killCount,
+    missCount: character.missCount,
+    upgrades: character.upgrades,
+    heals: character.heals,
+    hasDied: character.hasDied,
+    hasWon: false,
+    hasDied: character.hasDied,
+    characterId: character.id,
+  };
+}
 function save() {
   localStorage.setItem(SAVE_KEY, JSON.stringify(gameState.getState()));
-  localStorage.setItem(SAVED_UPGRADES_KEY, JSON.stringify(gameState.getState().upgrades));
+  let charactersToSave = gameState.getState().characters.map((character) => {
+    if (character.id === gameState.getState().characterId) {
+      return serializeCharacterFromState(gameState.getState());
+    }
+    return character;
+  });
+  if (!charactersToSave.length) {
+    charactersToSave = [serializeCharacterFromState(gameState.getState())];
+  }
+  localStorage.setItem(SAVED_CHARACTERS, JSON.stringify(charactersToSave));
 }
 function validateGameData(data) {
   const tempState = new State();
@@ -70,26 +107,32 @@ function validateGameData(data) {
 }
 function load() {
   try {
-    const upgrades = JSON.parse(localStorage.getItem(SAVED_UPGRADES_KEY));
-    const healUpgrade = getUpgrade('Alchemist');
-    const savedState = JSON.parse(localStorage.getItem(SAVE_KEY));
+    const characters = JSON.parse(localStorage.getItem(SAVED_CHARACTERS));
     gameState.setState(validateGameData({
-      ...(savedState || {}),
-      upgrades: upgrades || [],
+      characters: characters || [],
     }));
-    if (!gameState.getState().enemy) {
-      genEnemy();
-      if (healUpgrade) {
-        gameState.setState({ heals: 1 });
-      }
-    }
-    updateUi(gameState.getState());
   } catch (err) {
     console.log(err);
   }
 }
+function selectCharacter(character) {
+  gameState.setState({
+    ...hydrateGameStateFromCharacter(character),
+  });
+}
 
 // engine
+const startGame = () => {
+  // apply heals upgrade (if dead)
+  const healUpgrade = getUpgrade('Alchemist');
+  if (!gameState.getState().enemy) {
+    genEnemy();
+    if (healUpgrade) {
+      gameState.setState({ heals: 1 });
+    }
+  }
+  // trigger upgrade purchase (if dead)
+}
 const upgradeTable = [
   { name: 'Alchemist', description: 'Gain one health potion for each area you visit', stats: [ { name: 'Potions', value: 1 } ] },
   { name: 'Cleave', description: 'Gain a chance to deal 2x damage on hit', stats: [ { name: 'Chance', value: .2 }, { name: 'Multiplier', value: 2 } ] },
@@ -238,6 +281,21 @@ const calcLevel = () => {
     wounds: dinged ? 0 : (shouldLevelUp ? woundsIfLevelUp : wounds),
   });
 };
+const getLocation = (state) => {
+  const defaultedState = state || gameState.getState();
+  if (defaultedState.level < 10) {
+    return 'Open Field';
+  }
+  if (defaultedState.level > 10) {
+    return 'Dark Woods';
+  }
+  if (defaultedState.level > 24) {
+    return 'Ruined Harbor';
+  }
+  if (defaultedState.level > 44) {
+    return 'Orc Stronghold';
+  }
+}
 const shouldLoot = () => {
   const scavengerUpgrade = { stats: [ { name: 'Loot Find', value: 0.1 } ] };
   let skewAmount = .6;
@@ -458,6 +516,9 @@ const getArmorRating = () => {
   const equippedHpItems = inventory.filter((item) => item.statType === 'Armor' && !!item.equipped);
   return equippedHpItems.reduce((total, item) => item.power + total, 0);
 };
+const getBlockRating = () => {
+  return Math.ceil(getArmorRating() / 10);
+};
 const calcWounds = (damage) => {
   const armorRating = getArmorRating();
   const damageMod = armorRating / 10;
@@ -528,6 +589,9 @@ function didWin() {
   }
   return false;
 }
+function isPlayerDead() {
+  return gameState.getState().wounds >= gameState.getState().hp;
+}
 function tick() {
   if (attackButtonEl.disabled) {
     return;
@@ -569,18 +633,7 @@ function tick() {
       lootProc();
       calcGp();
       if (didWin()) {
-        document.querySelector('.you_won').classList.remove('you_won-hidden');
-        characterCloseEl.innerText = 'New Game';
-        characterCloseEl.removeEventListener('click', closeCharacterMenu);
-        characterCloseEl.addEventListener('click', () => {
-          localStorage.removeItem('rpg-state');
-          load();
-          characterModalEl.classList.remove('modal-visible');
-          characterCloseEl.addEventListener('click', closeCharacterMenu);
-          characterCloseEl.innerText = 'Close';
-          document.querySelector('.you_won').classList.add('you_won-hidden');
-        });
-        characterModalEl.classList.add('modal-visible');
+        launchGameWinModal()
       } else {
         genEnemy();
         updateUi(gameState.getState());
@@ -597,15 +650,8 @@ function tick() {
     showWound(`-${wounds}`);
     gameState.setState({ wounds: gameState.getState().wounds + wounds });
   }
-  if (gameState.getState().wounds >= gameState.getState().hp) {
-    attackButtonEl.disabled = true;
-    setTimeout(() => {
-      gameMenuTitleEl.innerText = 'You died';
-      const killCount = new Intl.NumberFormat(navigator.language).format(gameState.getState().killCount);
-      gameMenuDescriptionEl.innerText = `after murdering ${killCount} orcs.`;
-      localStorage.removeItem('rpg-state');
-      gameMenuModalEl.classList.add('modal-visible');
-    }, 1000);
+  if (isPlayerDead()) {
+    launchDeathModal();
   }
 }
 
@@ -686,6 +732,10 @@ const shopSubCloseButtonEl = document.getElementById('shop_item_close_button');
 // boss dialog
 const bossDialogEl = document.getElementById('boss_dialog');
 const bossDialogCloseEl = document.getElementById('boss_dialog_close');
+// end menu
+const endMenuEl = document.getElementById('end_menu');
+const endMenuCloseEl = document.getElementById('end_close_button');
+const endMenuContentEl = document.getElementById('end_content');
 
 // data binding
 const UI = {
@@ -1045,18 +1095,8 @@ const UI = {
   characterLocation: {
     element: characterLocationEl,
     value: (el, state) => {
-      if (state.level < 10) {
-        el.innerText = 'Current Location: Open Field';
-      }
-      if (state.level > 10) {
-        el.innerText = 'Current Location: Dark Woods';
-      }
-      if (state.level > 24) {
-        el.innerText = 'Current Location: Ruined Harbor';
-      }
-      if (state.level > 44) {
-        el.innerText = 'Current Location: Orc Stronghold';
-      }
+      const location = getLocation(state);
+      el.innerText = `Current Location: ${location}`;
     },
   },
   characterStats: {
@@ -1096,7 +1136,7 @@ const UI = {
 
       const blockStatEl = document.createElement('li');
       blockStatEl.classList.add('label-small');
-      blockStatEl.innerHTML = `${Math.ceil(getArmorRating() / 10)} damage block`;
+      blockStatEl.innerHTML = `${getBlockRating()} damage block`;
       el.appendChild(blockStatEl);
 
       const dodgeEl = document.createElement('li');
@@ -1386,6 +1426,147 @@ const updateUi = (currentState) => {
     item.value(item.element, currentState);
   });
 };
+function buildEndMenuContent(title, displayLocation) {
+  const state = gameState.getState();
+  const {
+    hp,
+    wounds,
+    xp,
+    damage,
+    killCount,
+    gp,
+    upgrades,
+  } = state;
+  const location = getLocation();
+  const stats = [
+    `${hp - wounds} / ${hp} hp`,
+    `${xp} xp`,
+    `${damage} damage`,
+    `${getArmorRating()} armor`,
+    `${getBlockRating()} damage block`,
+    `${getDodgeRating()} dodge`,
+    `${getAccuracyRating()} accuracy`,
+    `${gp} gp`,
+  ];
+
+  const titleEl = document.createElement('p');
+  titleEl.classList.add('label-large', 'label-center', 'mdc-mt-lg');
+  titleEl.innerText = title;
+
+  const descriptionEl = document.createElement('p');
+  descriptionEl.classList.add('label-small', 'label-center');
+  if (displayLocation) {
+    const description1El = document.createElement('span');
+    description1El.innerText = `in the ${location}`;
+    const descriptionBreakEl = document.createElement('br');
+    descriptionEl.appendChild(description1El);
+    descriptionEl.appendChild(descriptionBreakEl);
+  }
+  const description2El = document.createElement('span');
+  description2El.innerText = `after murdering ${new Intl.NumberFormat(navigator.language).format(killCount)} orc`;
+  descriptionEl.appendChild(description2El);
+
+  const statHeaderEl = document.createElement('p');
+  statHeaderEl.classList.add('label-small', 'inventory_category', 'mdc-mt-md');
+  statHeaderEl.innerText = 'Stats';
+  const statListEl = document.createElement('ul');
+  statListEl.classList.add('stat_list', 'mdc-mb-md');
+  stats.forEach((stat) => {
+    const statEl = document.createElement('li');
+    statEl.classList.add('label-medium');
+    statEl.innerText = stat;
+    statListEl.appendChild(statEl);
+  });
+
+  const inventoryEl = document.createElement('ul');
+  inventoryEl.classList.add('unequipped_items');
+  equipmentSlots.forEach((slot) => {
+    const equippedItem = state.inventory.find((item) => item.equipped === slot.key);
+
+    const containerEl = document.createElement('li');
+
+    const slotNameEl = document.createElement('p');
+    slotNameEl.classList.add('label-small', 'inventory_category');
+    slotNameEl.innerText = slot.value;
+    containerEl.appendChild(slotNameEl);
+
+    const itemSlotEl = document.createElement('div');
+    itemSlotEl.classList.add('inventory_item');
+
+    const itemNameEl = document.createElement('p');
+    itemNameEl.classList.add('label-large');
+    itemNameEl.innerText = equippedItem ? equippedItem.name : 'Nothing';
+    itemSlotEl.appendChild(itemNameEl);
+
+    const itemStatEl = document.createElement('p');
+    itemStatEl.classList.add('label-medium');
+    itemStatEl.innerText = equippedItem ? `${equippedItem.power} ${equippedItem.statType}` : 'N/A';
+    itemSlotEl.appendChild(itemStatEl);
+
+    containerEl.appendChild(itemSlotEl);
+    
+    inventoryEl.appendChild(containerEl);
+  });
+
+  const upgradeHeaderEl = document.createElement('p');
+  upgradeHeaderEl.classList.add('label-small', 'inventory_category');
+  upgradeHeaderEl.innerText = 'Upgrades';
+  const upgradesEl = document.createElement('ul');
+  upgradesEl.classList.add('upgrade_list');
+  if (upgrades.length) {
+    upgrades.forEach((upgrade) => {
+      const el = document.createElement('li');
+      el.classList.add('upgrade_list_item');
+      const name = document.createElement('p');
+      name.classList.add('label-medium');
+      name.innerText = upgrade.name;
+      el.appendChild(name);
+      const description = document.createElement('p');
+      description.classList.add('label-small');
+      description.innerText = upgrade.description;
+      el.appendChild(description);
+      upgradesEl.appendChild(el);
+    });
+  } else {
+    const noUpgradesEl = document.createElement('p');
+    noUpgradesEl.classList.add('label-small');
+    noUpgradesEl.innerText = 'None';
+    upgradesEl.appendChild(noUpgradesEl);
+  }
+
+  return [
+    titleEl,
+    descriptionEl,
+    statHeaderEl,
+    statListEl,
+    inventoryEl,
+    upgradeHeaderEl,
+    upgradesEl,
+  ];
+}
+function launchDeathModal() {
+  attackButtonEl.disabled = true;
+  gameState.setState({ hasDied: true });
+  save();
+  setTimeout(() => {
+    const endMenuContent = buildEndMenuContent('You died', true);
+    endMenuContent.forEach((el) => {
+      endMenuContentEl.appendChild(el);
+    });
+    endMenuEl.classList.add('modal-visible');
+  }, 1000);
+}
+function launchGameWinModal() {
+  attackButtonEl.disabled = true;
+  gameState.setState({ hasWon: true });
+  save();
+  setTimeout(() => {
+    const endMenuContent = buildEndMenuContent('You won', false);
+    endMenuContent.forEach((el) => {
+      endMenuContentEl.appendChild(el);
+    });
+  }, 1000);
+}
 
 // actions
 titleIconEl.addEventListener('click', () => {
@@ -1412,7 +1593,8 @@ attackButtonEl.addEventListener('touchend', tick, { passive: true });
 
 document.addEventListener('keypress', debounce((e) => {
   e.preventDefault();
-  if (e.key === ' ') {
+  const openModals = document.querySelector('.modal-visible');
+  if (e.key === ' ' && !openModals) {
     onAttack();
     tick();
   }
@@ -1510,6 +1692,10 @@ function fromShopSubMenu() {
 shopSubCloseButtonEl.addEventListener('click', fromShopSubMenu);
 bossDialogCloseEl.addEventListener('click', () => {
   bossDialogEl.classList.remove('dialog-visible');
+});
+endMenuCloseEl.addEventListener('click', () => {
+  endMenuEl.classList.remove('modal-visible');
+  gameMenuModalEl.classList.add('modal-visible');
 });
 
 /* INIT GAME */

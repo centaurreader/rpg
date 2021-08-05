@@ -116,7 +116,6 @@
         <h1 class="visually_hidden">Character</h1>
         <p id="current_location" class="label-small">Current Location: Open Field</p>
         <div class="container">
-          <p class="label-large you_won you_won-hidden">Orcs Defeated</p>
           <img src="img/character.gif" alt="" width="128" class="character_image" />
           <ul class="stat_list" id="character_stats"></ul>
         </div>
@@ -185,6 +184,15 @@
         <button id="game_menu_button_continue" class="action_button action_button-hollow action_button-hidden" type="button">Continue</button>
       </div>
       <p class="by label-center">v1.2 by <a href="https://centaurreader.com">centaurreader</a>.</p>
+    </section>
+
+    <section id="end_menu" class="modal">
+      <div class="modal_inner">
+        <h1 class="visually_hidden">End of Run</h1>
+        <div class="container" id="end_content">
+        </div>
+        <button id="end_close_button" class="action_button" type="button">End Run</button>
+      </div>
     </section>
 
     <section id="area_menu" class="modal">

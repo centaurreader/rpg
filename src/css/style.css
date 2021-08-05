@@ -419,3 +419,13 @@ input {
 #heal_menu_image {
   margin: 1rem auto 2rem;
 }
+
+.mdc-mt-md {
+  margin-top: 1rem;
+}
+.mdc-mt-lg {
+  margin-top: 1.5rem;
+}
+.mdc-mb-md {
+  margin-bottom: 1rem;
+}

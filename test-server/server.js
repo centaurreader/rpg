@@ -56,5 +56,5 @@ const server = http.createServer(options, (request, response) => {
 });
 
 server.listen(3000, () => {
-  console.log('listening');
+  console.log('listening on 3000');
 });

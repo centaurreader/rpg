@@ -114,6 +114,8 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - [x] defer css loading for custom font
 - [x] include meta description
 - [x] make toolbar list items valid html
+- [x] (bug) space bar triggers attack while in modals
+- [x] (bug) you will die before being healed by level up causing you to have HP but still get game over
 - [x] add permanent upgrades for purchase on death (roguelite ish)
   - [x] Drain: 1% life steal on hit
     - [x] check for drain in tick and apply based on damage done
@@ -141,16 +143,17 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
     - [x] heal image asset for modal
 - [ ] upgrade UI
   - [x] display upgrades in character screen
-  - [ ] use game win modal as death modal (show stats, equip, upgrades, etc)
-  - [ ] buy upgrade on death
-    - [ ] only allow to buy one upgrade
-    - [ ] end and go back to title screen
-  - [ ] new game screens
-    - [ ] start new character
+  - [x] use game win modal as death modal
+    - [x] display stats
+    - [x] display equipment
+    - [x] display upgrades
+  - [ ] multi-char handling
+    - [x] serialize character on save
+    - [x] move upgrade hydration refs to character list
+    - [ ] start new character + set name
     - [ ] continue existing character
     - [ ] delete character
-- [ ] pwa compliance
-  - [x] add manifest, sw
-  - [ ] test deployed and installed cache changing
-- [ ] (bug) space bar triggers attack while in modals
-- [x] (bug) you will die before being healed by level up causing you to have HP but still get game over
+    - [ ] hydrate state from selected char
+  - [ ] buy upgrade on new game start (existing char, after each death)
+    - [ ] only allow to buy one upgrade
+    - [ ] end and go back to title screen
