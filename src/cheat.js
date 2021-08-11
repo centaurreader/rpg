@@ -2,6 +2,7 @@ const cheatModalEl = document.getElementById('cheat');
 const cheatXpI = document.getElementById('cheat_xp');
 const cheatLevelI = document.getElementById('cheat_level');
 const cheatHpI = document.getElementById('cheat_hp');
+const cheatGpI = document.getElementById('cheat_gp');
 const cheatCloseEl = document.getElementById('cheat_close');
 const alchemistCheatEl = document.getElementById('cheat_alchemist');
 const cleaveCheatEl = document.getElementById('cheat_cleave');
@@ -40,6 +41,7 @@ document.addEventListener('keydown', (e) => {
 cheatXpI.addEventListener('blur', (e) => applyCheat('xp', e.target.value));
 cheatLevelI.addEventListener('blur', (e) => applyCheat('level', e.target.value));
 cheatHpI.addEventListener('blur', (e) => applyCheat('hp', e.target.value));
+cheatGpI.addEventListener('blur', (e) => applyCheat('gp', e.target.value));
 
 alchemistCheatEl.addEventListener('click', (event) => {
   applyUpgrade(getUpgradeFromTable('Alchemist'), alchemistCheatEl.checked);

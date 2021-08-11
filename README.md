@@ -147,7 +147,10 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
     - [x] display stats
     - [x] display equipment
     - [x] display upgrades
-  - [x] multi-char handling
+  - [x] buy upgrade on death
+    - [x] only allow to buy one upgrade
+    - [x] end and go back to title screen
+  - [ ] multi-char handling
     - [x] serialize character on save
     - [x] move upgrade hydration refs to character list
     - [x] start new character + set name
@@ -156,6 +159,5 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
     - [x] continue existing character
     - [x] display name in character screen, main game screen
     - [x] only persist upgrades and heals on death (reset xp, hp, inv, etc.)
-  - [ ] buy upgrade on death
-    - [ ] only allow to buy one upgrade
-    - [ ] end and go back to title screen
+    - [ ] (bug) stats are not reset on death (die, refresh, continue, observe: same stats)
+    - [ ] add 'view character' from main menu

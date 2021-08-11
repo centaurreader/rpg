@@ -1401,7 +1401,7 @@ const UI = {
 
         const characterDescriptionEl = document.createElement('p');
         characterDescriptionEl.classList.add('label-small');
-        const upgradeList = character.upgrades.reduce((list, upgrade) => `${list}${upgrade}, `, '');
+        const upgradeList = character.upgrades.reduce((list, upgrade, i) => `${list}${upgrade.name}${i === character.upgrades.length - 1 ? '' : ', '}`, '');
         characterDescriptionEl.innerText = `Lvl ${character.level}: ${upgradeList || 'No upgrades'}`;
         characterEl.appendChild(characterDescriptionEl);
 
@@ -1490,7 +1490,7 @@ const updateUi = (currentState) => {
     item.value(item.element, currentState);
   });
 };
-function buildEndMenuContent(title, displayLocation) {
+function buildEndMenuContent(title, isGameVictory) {
   const state = gameState.getState();
   const {
     hp,
@@ -1519,7 +1519,7 @@ function buildEndMenuContent(title, displayLocation) {
 
   const descriptionEl = document.createElement('p');
   descriptionEl.classList.add('label-small', 'label-center');
-  if (displayLocation) {
+  if (!isGameVictory) {
     const description1El = document.createElement('span');
     description1El.innerText = `in the ${location}`;
     const descriptionBreakEl = document.createElement('br');
@@ -1529,6 +1529,91 @@ function buildEndMenuContent(title, displayLocation) {
   const description2El = document.createElement('span');
   description2El.innerText = `after murdering ${new Intl.NumberFormat(navigator.language).format(killCount)} orc`;
   descriptionEl.appendChild(description2El);
+
+  if (!isGameVictory) {
+    const description3El = document.createElement('p');
+    description3El.classList.add('label-small', 'label-center', 'mdc-mt-md');
+    description3El.innerText = `Your XP, HP, level, and inventory are lost.`;
+    descriptionEl.appendChild(description3El);
+  }
+
+  let upgradeShopHeaderEl;
+  let upgradeShopEl;
+  if (!isGameVictory) {
+    upgradeShopHeaderEl = document.createElement('p');
+    upgradeShopHeaderEl.classList.add('label-small', 'inventory_category', 'mdc-mt-md');
+    upgradeShopHeaderEl.innerText = 'Purchase Upgrades';
+
+    upgradeShopEl = document.createElement('ul');
+    upgradeShopEl.setAttribute('id', 'upgrade_shop');
+    upgradeTable.forEach((upgrade) => {
+
+      const upgradeShopItemEl = document.createElement('li');
+      upgradeShopItemEl.classList.add('mdc-mb-md');
+
+      const upgradeShopItemNameEl = document.createElement('p');
+      upgradeShopItemNameEl.classList.add('label-medium');
+      upgradeShopItemNameEl.innerText = upgrade.name;
+      upgradeShopItemEl.appendChild(upgradeShopItemNameEl);
+
+      const upgradeShopItemDescriptionEl = document.createElement('p');
+      upgradeShopItemDescriptionEl.classList.add('label-small');
+      upgradeShopItemDescriptionEl.innerText = upgrade.description;
+      upgradeShopItemEl.appendChild(upgradeShopItemDescriptionEl);
+
+      const upgradeShopItemActionsEl = document.createElement('div');
+      upgradeShopItemActionsEl.classList.add('upgrade_actions');
+
+      const hasUpgrade = getUpgrade(upgrade.name);
+
+      const upgradeShopItemPurchaseContainerEl = document.createElement('div');
+      const upgradeShopItemPurchaseEl = document.createElement('button');
+      upgradeShopItemPurchaseEl.setAttribute('type', 'button');
+      upgradeShopItemPurchaseEl.classList.add(
+        'action_button',
+        'action_button-small',
+      );
+      upgradeShopItemPurchaseEl.innerText = hasUpgrade ? 'Purchased' : 'Buy';
+      if (hasUpgrade) {
+        upgradeShopItemPurchaseEl.setAttribute('disabled', 'disabled');
+      }
+      upgradeShopItemPurchaseContainerEl.appendChild(upgradeShopItemPurchaseEl);
+      upgradeShopItemActionsEl.appendChild(upgradeShopItemPurchaseContainerEl);
+      
+      let upgradeShopItemPriceEl = document.createElement('p');
+      if (!hasUpgrade) {
+        upgradeShopItemPriceEl = document.createElement('p');
+        upgradeShopItemPriceEl.classList.add('label-mini');
+        upgradeShopItemPriceEl.innerText = '1,200 gp';
+        upgradeShopItemActionsEl.appendChild(upgradeShopItemPriceEl);
+      }
+      upgradeShopItemEl.appendChild(upgradeShopItemActionsEl);
+
+      upgradeShopItemPurchaseEl.addEventListener('click', () => {
+        const { gp } = gameState.getState();
+        if (gp < 1200) {
+          return;
+        }
+        const { upgrades, } = gameState.getState();
+        gameState.setState({
+          upgrades: [
+            ...upgrades,
+            upgrade,
+          ],
+          gp: gp - 1200,
+        });
+        save();
+        upgradeShopItemPurchaseEl.innerText = 'Purchased';
+        document.querySelectorAll('#upgrade_shop li button').forEach((el) => {
+          el.setAttribute('disabled', 'disabled');
+        })
+        // upgradeShopItemPurchaseEl.setAttribute('disabled', 'disabled');
+        upgradeShopItemActionsEl.removeChild(upgradeShopItemPriceEl);
+      });
+
+      upgradeShopEl.appendChild(upgradeShopItemEl);
+    });
+  }
 
   const statHeaderEl = document.createElement('p');
   statHeaderEl.classList.add('label-small', 'inventory_category', 'mdc-mt-md');
@@ -1601,6 +1686,8 @@ function buildEndMenuContent(title, displayLocation) {
   return [
     titleEl,
     descriptionEl,
+    upgradeShopHeaderEl,
+    upgradeShopEl,
     statHeaderEl,
     statListEl,
     inventoryEl,
@@ -1612,7 +1699,7 @@ function launchDeathModal() {
   attackButtonEl.disabled = true;
   gameState.setState({ hasDied: true });
   setTimeout(() => {
-    const endMenuContent = buildEndMenuContent('You died', true);
+    const endMenuContent = buildEndMenuContent('You died', false);
     endMenuContent.forEach((el) => {
       endMenuContentEl.appendChild(el);
     });
@@ -1808,6 +1895,10 @@ endMenuCloseEl.addEventListener('click', () => {
   endMenuEl.classList.remove('modal-visible');
   gameMenuModalEl.classList.add('modal-visible');
   updateUi(gameState.getState());
+  const upgradeShopEl = document.getElementById('upgrade_shop');
+  if (upgradeShopEl) {
+    upgradeShopEl.parentElement.removeChild(upgradeShopEl);
+  }
 });
 
 /* INIT GAME */

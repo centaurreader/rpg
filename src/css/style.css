@@ -146,6 +146,11 @@ button { cursor: pointer; }
   font-size: 1rem;
   margin-bottom: .5rem;
 }
+.label-mini {
+  font-weight: 300;
+  font-size: .825rem;
+  margin-bottom: .5rem;
+}
 .bar {
   border: 4px solid #f6e8e8;
   background-color: transparent;
@@ -460,3 +465,10 @@ input {
   align-items: flex-end;
 }
 .name_and_level > * { margin-right: .5rem; }
+
+.upgrade_actions {
+  display: flex;
+  align-items: center;
+  height: 2rem;
+}
+.upgrade_actions > * { margin-bottom: 0; margin-right: .5rem; }
