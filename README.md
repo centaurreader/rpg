@@ -147,13 +147,15 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
     - [x] display stats
     - [x] display equipment
     - [x] display upgrades
-  - [ ] multi-char handling
+  - [x] multi-char handling
     - [x] serialize character on save
     - [x] move upgrade hydration refs to character list
-    - [ ] start new character + set name
-    - [ ] continue existing character
-    - [ ] delete character
-    - [ ] hydrate state from selected char
-  - [ ] buy upgrade on new game start (existing char, after each death)
+    - [x] start new character + set name
+    - [x] delete character
+    - [x] (bug) new game does not reset in-progress state
+    - [x] continue existing character
+    - [x] display name in character screen, main game screen
+    - [x] only persist upgrades and heals on death (reset xp, hp, inv, etc.)
+  - [ ] buy upgrade on death
     - [ ] only allow to buy one upgrade
     - [ ] end and go back to title screen

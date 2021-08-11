@@ -15,6 +15,8 @@ body {
   font-family: 'Noto Sans JP', sans-serif;
 }
 
+button { cursor: pointer; }
+
 #dungeon { position: relative; }
 #loot { min-height: 1rem; }
 
@@ -429,3 +431,32 @@ input {
 .mdc-mb-md {
   margin-bottom: 1rem;
 }
+
+#character_list {
+  position: relative;
+  z-index: 2000;
+}
+.character_list_item {
+  background-color: rgba(47,44,44,.8);
+  padding: .25rem;
+  margin-bottom: .5rem;
+}
+.character_list_item_actions {
+  display: flex;
+  justify-content: space-between;
+}
+.character_list_item_actions button {
+  margin: .25rem 0;
+}
+
+.input { margin: 1rem auto; width: 80%; }
+.input_label {
+  display: block;
+}
+.input_control { width: 100%; }
+
+.name_and_level {
+  display: flex;
+  align-items: flex-end;
+}
+.name_and_level > * { margin-right: .5rem; }

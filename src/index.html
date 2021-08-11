@@ -75,7 +75,10 @@
       <div id="dungeon" class="main_container">
         <section class="info_area info_area-player">
           <h2 class="visually_hidden">Player</h2>
-          <p id="level" class="label-large">Level 1</p>
+          <div class="name_and_level">
+            <p id="character_name" class="label-large">Name</p>
+            <p id="level" class="label-medium">Level 1</p>
+          </div>
           <div class="bar">
             <div class="bar_filler" id="xp_status"></div>
           </div>
@@ -181,9 +184,26 @@
           <p id="game_menu_description" class="label-small label-center">Murder Orcs. Get Loot. Level Up.</p>
         </div>
         <button id="game_menu_button" class="action_button" type="button">New Game</button>
-        <button id="game_menu_button_continue" class="action_button action_button-hollow action_button-hidden" type="button">Continue</button>
+        <p class="label-small inventory_category">Characters</p>
+        <ul id="character_list">
+        </ul>
       </div>
       <p class="by label-center">v1.2 by <a href="https://centaurreader.com">centaurreader</a>.</p>
+    </section>
+
+    <section id="new_character_menu" class="modal">
+      <div class="modal_inner modal_inner-no_fill game_menu_background">
+        <div class="container container-no_fill">
+          <img class="game_menu_logo" src="img/helmet.png" height="32" width="32" alt="" />
+          <h1 class="label-large label-center">Name your character</h1>
+          <p class="label-small label-center">Name your murderer.</p>
+          <label class="input">
+            <span class="input_label">Name</span>
+            <input class="input_control" type="text" id="character_name_input" />
+          </label>
+        </div>
+        <button id="new_character_button" class="action_button" type="button">Start</button>
+      </div>
     </section>
 
     <section id="end_menu" class="modal">

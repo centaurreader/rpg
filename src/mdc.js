@@ -14,6 +14,7 @@ function debounce(func, delay) {
 // state
 function State() {
   let state = {
+    name: null,
     xp: 0,
     gp: 0,
     hp: 200,
@@ -49,23 +50,26 @@ const SAVED_CHARACTERS = 'rpg-characters';
 function serializeCharacterFromState() {
   const state = gameState.getState();
   return {
-    xp: state.xp,
+    name: state.name,
+    xp: state.hasDied ? 0 : state.xp,
     gp: state.gp,
-    hp: state.hp,
+    hp: state.hasDied ? 200 : state.hp,
+    damage: state.hasDied ? 6 : state.damage,
     wounds: state.hasDied ? 0 : state.wounds,
-    level: state.level,
+    level: state.hasDied ? 1: state.level,
     inventory: state.inventory,
     enemy: state.hasDied ? null : state.enemy,
     killCount: state.killCount,
     upgrades: state.upgrades,
     heals: state.heals,
-    hasDied: true,
+    hasDied: state.hasDied,
     hasWon: state.hasWon,
     characterId: state.characterId,
   };
 }
 function hydrateGameStateFromCharacter(character) {
   return {
+    name: character.name,
     xp: character.xp,
     gp: character.gp,
     hp: character.hp,
@@ -81,20 +85,21 @@ function hydrateGameStateFromCharacter(character) {
     hasDied: character.hasDied,
     hasWon: false,
     hasDied: character.hasDied,
-    characterId: character.id,
+    characterId: character.characterId,
   };
 }
-function save() {
-  localStorage.setItem(SAVE_KEY, JSON.stringify(gameState.getState()));
+function save(shouldDumpState) {
   let charactersToSave = gameState.getState().characters.map((character) => {
-    if (character.id === gameState.getState().characterId) {
+    if (character.characterId === gameState.getState().characterId && !shouldDumpState) {
       return serializeCharacterFromState(gameState.getState());
     }
     return character;
   });
-  if (!charactersToSave.length) {
+  if (!charactersToSave.length && !shouldDumpState) {
     charactersToSave = [serializeCharacterFromState(gameState.getState())];
   }
+  gameState.setState({ characters: charactersToSave });
+  localStorage.setItem(SAVE_KEY, JSON.stringify(gameState.getState()));
   localStorage.setItem(SAVED_CHARACTERS, JSON.stringify(charactersToSave));
 }
 function validateGameData(data) {
@@ -670,6 +675,7 @@ const xpEl = document.getElementById('xp');
 const xpStatusEl = document.getElementById('xp_status');
 const hpEl = document.getElementById('hp');
 const hpStatusEl = document.getElementById('hp_status');
+const characterNameEl = document.getElementById('character_name');
 const levelEl = document.getElementById('level');
 const woundIndicatorEl = document.getElementById('wound_indicator');
 const enemyImageEl = document.getElementById('enemy');
@@ -711,7 +717,11 @@ const gameMenuModalEl = document.getElementById('game_menu');
 const gameMenuTitleEl = document.getElementById('game_menu_title');
 const gameMenuDescriptionEl = document.getElementById('game_menu_description');
 const gameMenuButtonEl = document.getElementById('game_menu_button');
-const gameMenuContinueButtonEl = document.getElementById('game_menu_button_continue');
+const characterListEl = document.getElementById('character_list');
+// new character menu
+const newCharcterMenuEl = document.getElementById('new_character_menu');
+const charcterNameInputEl = document.getElementById('character_name_input');
+const newCharcterButtonEl = document.getElementById('new_character_button');
 // area menu
 const areaMenuModalEl = document.getElementById('area_menu');
 const areaMenuImageEl = document.getElementById('area_menu_image');
@@ -775,6 +785,12 @@ const UI = {
       el.innerHTML = `${el, state.gp} gp`;
     },
   },
+  characterName: {
+    element: characterNameEl,
+    value: (el, state) => {
+      el.innerText = state.name;
+    },
+  },
   level: {
     element: levelEl,
     value: (el, state) => {
@@ -800,7 +816,7 @@ const UI = {
   enemyImage: {
     element: enemyImageEl,
     value: (el, state) => {
-      el.src = state.enemy.image || 'img/enemy.gif';
+      el.src = (state.enemy && state.enemy.image) || 'img/enemy.gif';
     },
   },
   enemyName: {
@@ -1082,16 +1098,6 @@ const UI = {
       elements.forEach((newElement) => { el.appendChild(newElement); });
     },
   },
-  continueButton: {
-    element: gameMenuContinueButtonEl,
-    value: (el, state) => {
-      if (state.wounds < state.hp && state.killCount > 0) {
-        el.classList.remove('action_button-hidden');
-      } else {
-        el.classList.add('action_button-hidden');
-      }
-    },
-  },
   characterLocation: {
     element: characterLocationEl,
     value: (el, state) => {
@@ -1103,6 +1109,11 @@ const UI = {
     element: characterStatsEl,
     value: (el, state) => {
       el.innerHTML = null;
+
+      const nameEl = document.createElement('li');
+      nameEl.classList.add('label-large');
+      nameEl.innerText = state.name;
+      el.appendChild(nameEl);
 
       const levelStatEl = document.createElement('li');
       levelStatEl.classList.add('label-large');
@@ -1369,6 +1380,59 @@ const UI = {
       el.innerText = `${heals === 0 ? 'No' : heals} ${heals > 1 ? 'potions' : 'potion'} available`;
     },
   },
+  characterList: {
+    element: characterListEl,
+    value: (el, { characters }) => {
+      el.innerText = '';
+      if (!characters.length) {
+        const emptyStateCharacterListEl = document.createElement('li');
+        emptyStateCharacterListEl.classList.add('character_list_item', 'label-small', 'label-center');
+        emptyStateCharacterListEl.innerText = 'No saved characters';
+        el.appendChild(emptyStateCharacterListEl);
+      }
+      characters.forEach((character) => {
+        const characterEl = document.createElement('li');
+        characterEl.classList.add('character_list_item');
+
+        const characterNameEl = document.createElement('p');
+        characterNameEl.classList.add('label-medium');
+        characterNameEl.innerText = character.name;
+        characterEl.appendChild(characterNameEl);
+
+        const characterDescriptionEl = document.createElement('p');
+        characterDescriptionEl.classList.add('label-small');
+        const upgradeList = character.upgrades.reduce((list, upgrade) => `${list}${upgrade}, `, '');
+        characterDescriptionEl.innerText = `Lvl ${character.level}: ${upgradeList || 'No upgrades'}`;
+        characterEl.appendChild(characterDescriptionEl);
+
+        const actionContainerEl = document.createElement('div');
+        actionContainerEl.classList.add('character_list_item_actions');
+        const continueContainerEl = document.createElement('div');
+        const continueButtonEl = document.createElement('button');
+        continueButtonEl.setAttribute('type', 'button');
+        continueButtonEl.classList.add('action_button', 'action_button-small');
+        continueButtonEl.innerText = 'Continue';
+        continueContainerEl.appendChild(continueButtonEl);
+        continueButtonEl.addEventListener('click', () => {
+          continueCharacter(character);
+        });
+        const deleteContainerEl = document.createElement('div');
+        const deleteButtonEl = document.createElement('button');
+        deleteButtonEl.setAttribute('type', 'button');
+        deleteButtonEl.classList.add('action_button', 'action_button-small', 'action_button-hollow');
+        deleteButtonEl.innerText = 'Delete';
+        deleteContainerEl.appendChild(deleteButtonEl);
+        deleteButtonEl.addEventListener('click', () => {
+          deleteCharacter(character);
+        });
+        actionContainerEl.appendChild(continueContainerEl);
+        actionContainerEl.appendChild(deleteContainerEl);
+        characterEl.appendChild(actionContainerEl);
+
+        el.appendChild(characterEl);
+      });
+    },
+  }
 };
 const sellItem = (itemToSell) => {
   gameState.setState({
@@ -1547,13 +1611,16 @@ function buildEndMenuContent(title, displayLocation) {
 function launchDeathModal() {
   attackButtonEl.disabled = true;
   gameState.setState({ hasDied: true });
-  save();
   setTimeout(() => {
     const endMenuContent = buildEndMenuContent('You died', true);
     endMenuContent.forEach((el) => {
       endMenuContentEl.appendChild(el);
     });
     endMenuEl.classList.add('modal-visible');
+    save(true);
+    gameState.setState({
+      ...hydrateGameStateFromCharacter(serializeCharacterFromState(true)),
+    });
   }, 1000);
 }
 function launchGameWinModal() {
@@ -1573,17 +1640,61 @@ titleIconEl.addEventListener('click', () => {
   gameMenuModalEl.classList.add('modal-visible');
 });
 gameMenuButtonEl.addEventListener('click', () => {
-  localStorage.removeItem('rpg-state');
-  load();
-  attackButtonEl.disabled = false;
+  newCharcterMenuEl.classList.add('modal-visible');
   gameMenuModalEl.classList.remove('modal-visible');
   gameMenuTitleEl.innerText = 'Murder Death Click';
   gameMenuDescriptionEl.innerText = 'Murder Orcs. Get Loot. Level Up.';
+});
+newCharcterButtonEl.addEventListener('click', () => {
+  const name = charcterNameInputEl.value;
+  if (!name) {
+    return;
+  }
+  const { characters } = gameState.getState();
+  gameState.setState({
+    ...new State().getState(),
+    name,
+  });
+  gameState.setState({
+    characters: [
+      ...characters || [],
+      serializeCharacterFromState(),
+    ],
+  });
+  genEnemy();
+  save();
+  updateUi(gameState.getState());
+  attackButtonEl.disabled = false;
+  newCharcterMenuEl.classList.remove('modal-visible');
   attackButtonEl.focus();
+  charcterNameInputEl.value = '';
 });
-gameMenuContinueButtonEl.addEventListener('click', () => {
+function continueCharacter(character) {
+  if (character.hasDied) {
+    gameState.setState({
+      ...hydrateGameStateFromCharacter(character),
+      hasDied: false,
+    });
+  } else {
+    gameState.setState({
+      ...hydrateGameStateFromCharacter(character),
+    });
+  }
+  if (!gameState.getState().enemy) {
+    genEnemy();
+  }
+  updateUi(gameState.getState());
+  attackButtonEl.disabled = false;
   gameMenuModalEl.classList.remove('modal-visible');
-});
+  attackButtonEl.focus();
+}
+function deleteCharacter(character) {
+  const { characters } = gameState.getState();
+  gameState.setState({ characters: characters.filter((c) => c !== character)});
+  save(true);
+  updateUi(gameState.getState());
+}
+
 if (typeof window.ontouchstart === 'undefined') {
   attackButtonEl.addEventListener('mousedown', onAttack);
   attackButtonEl.addEventListener('mouseup', tick);
@@ -1696,7 +1807,9 @@ bossDialogCloseEl.addEventListener('click', () => {
 endMenuCloseEl.addEventListener('click', () => {
   endMenuEl.classList.remove('modal-visible');
   gameMenuModalEl.classList.add('modal-visible');
+  updateUi(gameState.getState());
 });
 
 /* INIT GAME */
 load();
+updateUi(gameState.getState());
