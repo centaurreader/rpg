@@ -1416,6 +1416,15 @@ const UI = {
         continueButtonEl.addEventListener('click', () => {
           continueCharacter(character);
         });
+        const viewCharContainerEl = document.createElement('div');
+        const viewCharButtonEl = document.createElement('button');
+        viewCharButtonEl.setAttribute('type', 'button');
+        viewCharButtonEl.classList.add('action_button', 'action_button-small');
+        viewCharButtonEl.innerText = 'View';
+        viewCharContainerEl.appendChild(viewCharButtonEl);
+        viewCharButtonEl.addEventListener('click', () => {
+          viewCharacter(character);
+        });
         const deleteContainerEl = document.createElement('div');
         const deleteButtonEl = document.createElement('button');
         deleteButtonEl.setAttribute('type', 'button');
@@ -1425,7 +1434,11 @@ const UI = {
         deleteButtonEl.addEventListener('click', () => {
           deleteCharacter(character);
         });
-        actionContainerEl.appendChild(continueContainerEl);
+        const primaryActionContainerEl = document.createElement('div');
+        primaryActionContainerEl.classList.add('character_list_item_actions');
+        primaryActionContainerEl.appendChild(continueContainerEl);
+        primaryActionContainerEl.appendChild(viewCharContainerEl);
+        actionContainerEl.appendChild(primaryActionContainerEl);
         actionContainerEl.appendChild(deleteContainerEl);
         characterEl.appendChild(actionContainerEl);
 
@@ -1490,7 +1503,10 @@ const updateUi = (currentState) => {
     item.value(item.element, currentState);
   });
 };
-function buildEndMenuContent(title, isGameVictory) {
+function buildEndMenuContent(title, isGameVictory, actionLabel = 'End Run', noShopping, hideSubtitle) {
+  const endRunEl = document.getElementById('end_close_button');
+  endRunEl.innerText = actionLabel;
+
   const state = gameState.getState();
   const {
     hp,
@@ -1530,7 +1546,7 @@ function buildEndMenuContent(title, isGameVictory) {
   description2El.innerText = `after murdering ${new Intl.NumberFormat(navigator.language).format(killCount)} orc`;
   descriptionEl.appendChild(description2El);
 
-  if (!isGameVictory) {
+  if (!isGameVictory && !hideSubtitle) {
     const description3El = document.createElement('p');
     description3El.classList.add('label-small', 'label-center', 'mdc-mt-md');
     description3El.innerText = `Your XP, HP, level, and inventory are lost.`;
@@ -1539,7 +1555,8 @@ function buildEndMenuContent(title, isGameVictory) {
 
   let upgradeShopHeaderEl;
   let upgradeShopEl;
-  if (!isGameVictory) {
+  console.log('test', noShopping);
+  if (!isGameVictory && !noShopping) {
     upgradeShopHeaderEl = document.createElement('p');
     upgradeShopHeaderEl.classList.add('label-small', 'inventory_category', 'mdc-mt-md');
     upgradeShopHeaderEl.innerText = 'Purchase Upgrades';
@@ -1693,7 +1710,7 @@ function buildEndMenuContent(title, isGameVictory) {
     inventoryEl,
     upgradeHeaderEl,
     upgradesEl,
-  ];
+  ].filter((node) => node);
 }
 function launchDeathModal() {
   attackButtonEl.disabled = true;
@@ -1774,6 +1791,22 @@ function continueCharacter(character) {
   attackButtonEl.disabled = false;
   gameMenuModalEl.classList.remove('modal-visible');
   attackButtonEl.focus();
+}
+function viewCharacter(character) {
+  gameState.setState({
+    ...hydrateGameStateFromCharacter(character),
+  });
+  const content = buildEndMenuContent(
+    character.name,
+    false,
+    'Close',
+    true,
+    true,
+  );
+  content.forEach((el) => {
+    endMenuContentEl.appendChild(el);
+  });
+  endMenuEl.classList.add('modal-visible');
 }
 function deleteCharacter(character) {
   const { characters } = gameState.getState();
@@ -1899,6 +1932,9 @@ endMenuCloseEl.addEventListener('click', () => {
   if (upgradeShopEl) {
     upgradeShopEl.parentElement.removeChild(upgradeShopEl);
   }
+  setTimeout(() => {
+    endMenuContentEl.innerText = '';
+  }, 250);
 });
 
 /* INIT GAME */

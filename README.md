@@ -159,5 +159,7 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
     - [x] continue existing character
     - [x] display name in character screen, main game screen
     - [x] only persist upgrades and heals on death (reset xp, hp, inv, etc.)
-    - [ ] (bug) stats are not reset on death (die, refresh, continue, observe: same stats)
-    - [ ] add 'view character' from main menu
+    - [x] add 'view character' from main menu
+  - [ ] (bug) 1. die 2. do not buy an upgrade 3. continue as char
+          observe: game state is as it was when you died
+  - [ ] make the new update backwards compatible

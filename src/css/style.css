@@ -449,7 +449,9 @@ input {
 .character_list_item_actions {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
+.character_list_item_actions div div + div { margin-left: 1rem; }
 .character_list_item_actions button {
   margin: .25rem 0;
 }
