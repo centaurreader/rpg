@@ -82,7 +82,6 @@ function hydrateGameStateFromCharacter(character) {
     missCount: character.missCount,
     upgrades: character.upgrades,
     heals: character.heals,
-    hasDied: character.hasDied,
     hasWon: false,
     hasDied: character.hasDied,
     characterId: character.characterId,
@@ -1510,7 +1509,6 @@ function buildEndMenuContent(title, isGameVictory, actionLabel = 'End Run', noSh
   const state = gameState.getState();
   const {
     hp,
-    wounds,
     xp,
     damage,
     killCount,
@@ -1519,7 +1517,7 @@ function buildEndMenuContent(title, isGameVictory, actionLabel = 'End Run', noSh
   } = state;
   const location = getLocation();
   const stats = [
-    `${hp - wounds} / ${hp} hp`,
+    `${hp} hp`,
     `${xp} xp`,
     `${damage} damage`,
     `${getArmorRating()} armor`,
@@ -1555,7 +1553,6 @@ function buildEndMenuContent(title, isGameVictory, actionLabel = 'End Run', noSh
 
   let upgradeShopHeaderEl;
   let upgradeShopEl;
-  console.log('test', noShopping);
   if (!isGameVictory && !noShopping) {
     upgradeShopHeaderEl = document.createElement('p');
     upgradeShopHeaderEl.classList.add('label-small', 'inventory_category', 'mdc-mt-md');
@@ -1715,16 +1712,16 @@ function buildEndMenuContent(title, isGameVictory, actionLabel = 'End Run', noSh
 function launchDeathModal() {
   attackButtonEl.disabled = true;
   gameState.setState({ hasDied: true });
+  const endMenuContent = buildEndMenuContent('You died', false);
   setTimeout(() => {
-    const endMenuContent = buildEndMenuContent('You died', false);
+    save();
+    gameState.setState({
+      ...hydrateGameStateFromCharacter(serializeCharacterFromState()),
+    });
     endMenuContent.forEach((el) => {
       endMenuContentEl.appendChild(el);
     });
     endMenuEl.classList.add('modal-visible');
-    save(true);
-    gameState.setState({
-      ...hydrateGameStateFromCharacter(serializeCharacterFromState(true)),
-    });
   }, 1000);
 }
 function launchGameWinModal() {
