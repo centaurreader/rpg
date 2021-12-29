@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG</title>
+    <style>
+      li { padding: 8px; }
+      #player {
+        position: relative;
+        display: inline-block;
+        background-color: darkblue;
+        color: #fff;
+        height: 20px;
+        width: 20px;
+      }
+      #player::after {
+        position: absolute;
+        top: -4px;
+        left: 6px;
+        background-color: cyan;
+        content: ' ';
+        height: 8px;
+        width: 8px;
+      }
+      #enemy {
+        position: relative;
+        display: inline-block;
+        background-color: #34533D;
+        color: #fff;
+        height: 20px;
+        width: 20px;
+      }
+      #enemy::after {
+        position: absolute;
+        top: -4px;
+        left: 6px;
+        background-color: lime;
+        content: ' ';
+        height: 8px;
+        width: 8px;
+      }
+      .attack { visibility: hidden; }
+      .attack-lit { visibility: visible; }
+    </style>
+  </head>
+  <body>
+    <h1>Welcome to RPG</h1>
+    <ul>
+      <li>Player</li>
+      <li id="level">Level 1</li>
+      <li id="xp">0 xp</li>
+      <li><span id="player"></span></li>
+    </ul>
+    <ul><li id="attack" class="attack">⚡</li></ul>
+    <ul>
+      <li>Level 1 Orc</li>
+      <li><span id="enemy"></span></li>
+    </ul>
+    <script>
+      const xp = document.getElementById('xp');
+      const level = document.getElementById('level');
+      const enemy = document.getElementById('enemy');
+      const attack = document.getElementById('attack');
+      function onAttack() {
+        attack.classList.add('attack-lit');
+      }
+      enemy.addEventListener('mousedown', onAttack);
+      enemy.addEventListener('touchstart', onAttack);
+
+      function afterAttack() {
+        const currentXp = parseInt(xp.innerHTML.split(' ')[0], 10);
+        const newXp = currentXp === 9
+          ? 0
+          : currentXp + 1;
+        xp.innerHTML = `${newXp} xp`;
+        const currentLevel = parseInt(level.innerHTML.split(' ')[1], 10);
+        const newLevel = newXp === 0
+          ? currentLevel + 1
+          : currentLevel;
+        level.innerHTML = `Level ${newLevel}`;
+        attack.classList.remove('attack-lit');
+      }
+      enemy.addEventListener('mouseup', afterAttack);
+      enemy.addEventListener('touchend', afterAttack);
+    </script>
+  </body>
+</html>
