@@ -141,7 +141,7 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
     - [x] increment heal count on new area
     - [x] heal icon asset for navbar
     - [x] heal image asset for modal
-- [ ] upgrade UI
+- [x] upgrade UI
   - [x] display upgrades in character screen
   - [x] use game win modal as death modal
     - [x] display stats
@@ -160,6 +160,6 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
     - [x] display name in character screen, main game screen
     - [x] only persist upgrades and heals on death (reset xp, hp, inv, etc.)
     - [x] add 'view character' from main menu
-  - [ ] (bug) 1. die 2. do not buy an upgrade 3. continue as char
+  - [x] (bug) 1. die 2. do not buy an upgrade 3. continue as char
           observe: game state is as it was when you died
-  - [ ] make the new update backwards compatible
+  - [x] make the new update backwards compatible

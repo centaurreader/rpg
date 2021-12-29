@@ -1,3 +1,5 @@
+const v1dot2GameState = "{\"xp\":28,\"gp\":76,\"hp\":200,\"wounds\":2,\"damage\":6,\"level\":1,\"inventory\":[{\"name\":\"Lvl 4 Heavy Sword\",\"quality\":{\"name\":\"Heavy\",\"modifier\":3.5,\"statType\":\"Armor\"},\"type\":{\"name\":\"Sword\",\"type\":\"HAND\",\"modifier\":7,\"stats\":[{\"name\":\"Accuracy\",\"value\":75}],\"statType\":\"Damage\"},\"power\":98,\"statType\":\"Damage\",\"equipped\":null,\"level\":4},{\"name\":\"Lvl 4 Cheap Sandals\",\"quality\":{\"name\":\"Cheap\",\"modifier\":1,\"statType\":\"Armor\"},\"type\":{\"name\":\"Sandals\",\"type\":\"FEET\",\"modifier\":2,\"stats\":[{\"name\":\"Dodge\",\"value\":30}],\"statType\":\"Armor\"},\"power\":8,\"statType\":\"Armor\",\"equipped\":null,\"level\":4}],\"enemy\":{\"name\":\"Brilliant Orc\",\"level\":3,\"hp\":25,\"maxHp\":25,\"damage\":12,\"image\":\"img/enemy.gif\"},\"inventoryItem\":null,\"inventorySlot\":null,\"shopItems\":[],\"shopItem\":null,\"killCount\":7,\"missCount\":0}";
+
 /*
   //////////
   BEGIN GAME
@@ -69,22 +71,23 @@ function serializeCharacterFromState() {
 }
 function hydrateGameStateFromCharacter(character) {
   return {
-    name: character.name,
-    xp: character.xp,
-    gp: character.gp,
-    hp: character.hp,
-    wounds: character.wounds,
-    damage: character.damage,
-    level: character.level,
-    inventory: character.inventory,
-    enemy: character.enemy,
-    killCount: character.killCount,
-    missCount: character.missCount,
-    upgrades: character.upgrades,
-    heals: character.heals,
+    name: character.name || 'Unnamed',
+    xp: character.xp || 0,
+    gp: character.gp || 0,
+    hp: character.hp || 200,
+    wounds: character.wounds || 0,
+    damage: character.damage || 6,
+    level: character.level || 1,
+    inventory: character.inventory || [],
+    enemy: character.enemy || null,
+    killCount: character.killCount || 0,
+    missCount: character.missCount || 0,
+    upgrades: character.upgrades || [],
+    heals: character.heals || 0,
     hasWon: false,
-    hasDied: character.hasDied,
-    characterId: character.characterId,
+    hasDied: !!character.hasDied,
+    characterId: character.characterId
+      || crypto.getRandomValues(new Uint32Array(4)).join('-'),
   };
 }
 function save(shouldDumpState) {
@@ -98,7 +101,7 @@ function save(shouldDumpState) {
     charactersToSave = [serializeCharacterFromState(gameState.getState())];
   }
   gameState.setState({ characters: charactersToSave });
-  localStorage.setItem(SAVE_KEY, JSON.stringify(gameState.getState()));
+  // localStorage.setItem(SAVE_KEY, JSON.stringify(gameState.getState()));
   localStorage.setItem(SAVED_CHARACTERS, JSON.stringify(charactersToSave));
 }
 function validateGameData(data) {
@@ -109,12 +112,25 @@ function validateGameData(data) {
     inventory: ((data || {}).inventory || []).filter((item) => typeof item === 'object'),
   };
 }
+function loadLegacyData() {
+  const legacyData = localStorage.getItem(SAVE_KEY);
+  try {
+    return JSON.parse(legacyData);
+  } catch (err) {
+    return null;
+  }
+}
 function load() {
   try {
+    const legacyData = loadLegacyData()
+      ? [hydrateGameStateFromCharacter(loadLegacyData())]
+      : [];
     const characters = JSON.parse(localStorage.getItem(SAVED_CHARACTERS));
     gameState.setState(validateGameData({
-      characters: characters || [],
+      characters: characters || legacyData,
     }));
+    localStorage.removeItem(SAVE_KEY);
+    save();
   } catch (err) {
     console.log(err);
   }
