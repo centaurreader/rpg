@@ -9,7 +9,7 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 ## Build Production
 - Run `npm run build`
 - Rename `./dist/mdc.js` to `./dist/mdc.[version number].js`
-- Rename `./dist/css/style.css` to `./dist/style.[version number].css`
+- Rename `./dist/css/style.css` to `./dist/css/style.[version number].css`
 - Update imports in `./dist/index.html` with the new file names
 - Update displayed version in `./dist/index.html`
 
