@@ -12,6 +12,7 @@ RPG gameplay distilled to its purest essence. [Play the game](https://centaurrea
 - Rename `./dist/css/style.css` to `./dist/css/style.[version number].css`
 - Update imports in `./dist/index.html` with the new file names
 - Update displayed version in `./dist/index.html`
+- Remove `./dist/cheat.js` and remove script tag for cheat.js in `./dist/index.html`
 
 ## TODO
 ### v1
