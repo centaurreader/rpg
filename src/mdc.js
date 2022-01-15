@@ -130,7 +130,6 @@ function load() {
       characters: characters || legacyData,
     }));
     localStorage.removeItem(SAVE_KEY);
-    save();
   } catch (err) {
     console.log(err);
   }
