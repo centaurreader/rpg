@@ -1537,7 +1537,7 @@ function buildEndMenuContent(title, isGameVictory, actionLabel = 'End Run', noSh
   const stats = [
     `${hp} hp`,
     `${xp} xp`,
-    `${damage} damage`,
+    `${getDamage()} damage`,
     `${getArmorRating()} armor`,
     `${getBlockRating()} damage block`,
     `${getDodgeRating()} dodge`,
